@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getCase } from "@/lib/game/catalog";
 import { CaseOpenPanel } from "@/components/cases/CaseOpenPanel";
 import { CaseContents } from "@/components/cases/CaseContents";
+import { CaseQuickList } from "@/components/cases/CaseQuickList";
 
 export default function CasePage({ params }: { params: { caseId: string } }) {
   const lootCase = getCase(params.caseId);
@@ -19,9 +20,18 @@ export default function CasePage({ params }: { params: { caseId: string } }) {
         </div>
       </div>
 
-      <CaseOpenPanel lootCase={lootCase} />
-      <CaseContents lootCase={lootCase} />
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_360px] lg:items-start">
+        <div className="space-y-3">
+          <CaseOpenPanel lootCase={lootCase} />
+          <div className="lg:hidden">
+            <CaseQuickList lootCase={lootCase} />
+          </div>
+          <CaseContents lootCase={lootCase} />
+        </div>
+        <div className="hidden lg:block">
+          <CaseQuickList lootCase={lootCase} />
+        </div>
+      </div>
     </div>
   );
 }
-

@@ -21,8 +21,9 @@ export default function UpgradePage() {
   const [inventory, setInventory] = useState<Item[]>([]);
   const [catalog, setCatalog] = useState<Item[]>([]);
   const [spinning, setSpinning] = useState(false);
-  const [result, setResult] = useState<"win" | "lose" | null>(null);
   const [resultText, setResultText] = useState<string>("");
+  const [stopRoll, setStopRoll] = useState<number | null>(null);
+  const [preset, setPreset] = useState<{ kind: "mult" | "chance"; value: number } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -53,6 +54,25 @@ export default function UpgradePage() {
   const chance = Math.max(1, Math.min(95, rawChance || 0));
   const multiplier = targetItem && betValue > 0 ? targetItem.price / betValue : 0;
 
+  const pickTargetNear = (desiredValue: number) => {
+    if (!catalog.length) return null;
+    const desired = Math.max(desiredValue, betValue + 1);
+    const candidates = catalog
+      .filter((it) => it.price > betValue)
+      .slice()
+      .sort((a, b) => a.price - b.price);
+    if (candidates.length === 0) return null;
+    return candidates.find((it) => it.price >= desired) ?? candidates[candidates.length - 1]!;
+  };
+
+  const applyPreset = (next: { kind: "mult" | "chance"; value: number }) => {
+    if (betValue <= 0) return;
+    setPreset(next);
+    const desiredTarget = next.kind === "mult" ? betValue * next.value : betValue / Math.max(0.01, next.value / 100);
+    const pick = pickTargetNear(desiredTarget);
+    if (pick) setTarget(pick.id);
+  };
+
   const targetOptions = useMemo(() => {
     if (betValue <= 0) return catalog.slice().sort((a, b) => a.price - b.price);
     return catalog
@@ -68,8 +88,8 @@ export default function UpgradePage() {
     if (betValue >= targetItem.price) return alert("Ставка должна быть дешевле цели.");
 
     setSpinning(true);
-    setResult(null);
     setResultText("");
+    setStopRoll(null);
 
     type UpgradeRes = {
       won: boolean;
@@ -94,11 +114,16 @@ export default function UpgradePage() {
     }
 
     applyUpdate({ token: res.token, state: res.state });
+    setStopRoll(res.roll);
+
+    setInventory((prev) => {
+      const kept = prev.filter((i) => !selected.includes(i.id));
+      return res.won ? [res.targetItem, ...kept] : kept;
+    });
 
     // Let animation run; then show result.
     setTimeout(() => {
       const won = Boolean(res.won);
-      setResult(won ? "win" : "lose");
       setResultText(
         won
           ? `Победа! Ты получил ${res.targetItem.name} (${res.targetItem.price} ₽)`
@@ -140,7 +165,46 @@ export default function UpgradePage() {
 
         <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10 lg:col-span-1">
           <div className="mb-4 grid gap-3">
-            <UpgradeWheel chance={chance || 1} spinning={spinning} result={result} />
+            <UpgradeWheel chance={chance || 1} spinning={spinning} stopRoll={stopRoll} />
+
+            <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
+              <div className="text-xs text-white/55">Быстрый выбор</div>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {[2, 5, 10].map((x) => (
+                  <button
+                    key={`m_${x}`}
+                    onClick={() => applyPreset({ kind: "mult", value: x })}
+                    disabled={spinning || betValue <= 0}
+                    className={[
+                      "rounded-xl px-3 py-2 text-xs font-semibold ring-1 transition disabled:opacity-60",
+                      preset?.kind === "mult" && preset.value === x
+                        ? "bg-accent text-black ring-accent/40"
+                        : "bg-black/20 text-white/80 ring-white/10 hover:text-white",
+                    ].join(" ")}
+                  >
+                    x{x}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {[75, 50, 35].map((p) => (
+                  <button
+                    key={`c_${p}`}
+                    onClick={() => applyPreset({ kind: "chance", value: p })}
+                    disabled={spinning || betValue <= 0}
+                    className={[
+                      "rounded-xl px-3 py-2 text-xs font-semibold ring-1 transition disabled:opacity-60",
+                      preset?.kind === "chance" && preset.value === p
+                        ? "bg-accent text-black ring-accent/40"
+                        : "bg-black/20 text-white/80 ring-white/10 hover:text-white",
+                    ].join(" ")}
+                  >
+                    {p}%
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 text-[11px] text-white/55">Нажми x/%, чтобы автоматически выбрать цель справа.</div>
+            </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
                 <div className="text-xs text-white/55">Ставка</div>

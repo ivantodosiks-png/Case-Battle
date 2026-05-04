@@ -4,8 +4,51 @@ import type { CaseDropTable, Item, LootCase, Rarity } from "./types";
 const seed = 0x51f0_2026; // stable catalog seed
 const rnd = mulberry32(seed);
 
-const nameA = ["Nova", "Apex", "Vortex", "Echo", "Obsidian", "Nebula", "Pulse", "Forge", "Spectra", "Cipher", "Ion", "Arc"];
-const nameB = ["Shatter", "Blaze", "Drift", "Reactor", "Warden", "Mirage", "Stinger", "Flux", "Rift", "Volt", "Gleam", "Grav"];
+const weapons = [
+  "AK-47",
+  "M4A1-S",
+  "M4A4",
+  "AWP",
+  "Glock-18",
+  "USP-S",
+  "Desert Eagle",
+  "P250",
+  "Five-SeveN",
+  "MP9",
+  "MAC-10",
+  "MP7",
+  "UMP-45",
+  "P90",
+  "FAMAS",
+  "Galil AR",
+  "SSG 08",
+  "Nova",
+  "XM1014",
+];
+
+const finishes = [
+  "Redline",
+  "Asiimov",
+  "Vulcan",
+  "Hyper Beast",
+  "Neo-Noir",
+  "Nightwish",
+  "Slate",
+  "Printstream",
+  "Fade",
+  "Doppler",
+  "Case Hardened",
+  "Bloodsport",
+  "Neon Rider",
+  "Aquamarine Revenge",
+  "Fuel Injector",
+  "The Empress",
+  "Frontside Misty",
+  "Dragon Lore",
+  "Electric Hive",
+];
+
+const wears = ["Factory New", "Minimal Wear", "Field-Tested", "Well-Worn", "Battle-Scarred"];
 
 const gradients = [
   ["#111827", "#1f2937"],
@@ -38,9 +81,13 @@ function rarityPrice(r: Rarity) {
 function makeItem(i: number): Item {
   const rarity = pick(rnd, rarities);
   const [from, to] = pick(rnd, gradients);
+  const weapon = pick(rnd, weapons);
+  const finish = pick(rnd, finishes);
+  const wear = pick(rnd, wears);
+  const isSt = randInt(rnd, 0, 9) === 0;
   return {
     id: `itm_${i.toString(36)}`,
-    name: `Skin ${pick(rnd, nameA)}-${pick(rnd, nameB)} ${randInt(rnd, 1, 99)}`,
+    name: `${isSt ? "StatTrak™ " : ""}${weapon} | ${finish} (${wear})`,
     price: rarityPrice(rarity),
     rarity,
     image: { kind: "gradient", from, to },
@@ -110,4 +157,3 @@ export function getItem(itemId: string) {
 export function getDropTable(caseId: string) {
   return catalog.dropTables.find((t) => t.caseId === caseId) ?? null;
 }
-

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { Item, LootCase, SignedState } from "@/lib/game/types";
@@ -22,6 +23,7 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
   const [spinning, setSpinning] = useState(false);
   const [wonItem, setWonItem] = useState<Item | null>(null);
   const [trackX, setTrackX] = useState(0);
+  const [busyAction, setBusyAction] = useState<"sell" | null>(null);
 
   const reel = useMemo(() => {
     const pool = lootCase.itemIds.map((id) => getItem(id)).filter(Boolean) as Item[];
@@ -33,6 +35,7 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
     if (spinning) return;
     setSpinning(true);
     setWonItem(null);
+    setBusyAction(null);
 
     type OpenRes = {
       success: boolean;
@@ -65,6 +68,24 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
 
     setTrackX(target);
     setTimeout(() => setSpinning(false), 4800);
+  }
+
+  async function sell() {
+    if (!wonItem) return;
+    if (spinning) return;
+    if (busyAction) return;
+    setBusyAction("sell");
+
+    type SellRes = { success: boolean; token: string; state: SignedState; balance: number };
+    try {
+      const res = await apiPost<SellRes>("/api/inventory/sell", token, { itemId: wonItem.id });
+      applyUpdate({ token: res.token, state: res.state });
+      setWonItem(null);
+    } catch {
+      alert("Не удалось продать предмет.");
+    } finally {
+      setBusyAction(null);
+    }
   }
 
   return (
@@ -115,6 +136,21 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
 
       {wonItem ? (
         <div className="mt-4 rounded-2xl bg-card/55 p-3 text-sm ring-1 ring-accent/25">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Link
+              href="/inventory"
+              className="rounded-xl bg-accent px-3 py-2 text-xs font-semibold text-black transition hover:brightness-110"
+            >
+              Оставить
+            </Link>
+            <button
+              onClick={sell}
+              disabled={busyAction === "sell"}
+              className="rounded-xl bg-black/25 px-3 py-2 text-xs font-semibold text-white/80 ring-1 ring-white/10 transition hover:text-white disabled:opacity-60"
+            >
+              {busyAction === "sell" ? "Продаём…" : `Продать за ${wonItem.price} ₽`}
+            </button>
+          </div>
           Выпало: <span className="font-semibold text-white">{wonItem.name}</span>{" "}
           <span className="text-white/60">({wonItem.price} ₽)</span>
         </div>
