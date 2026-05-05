@@ -14,9 +14,9 @@ export default function CasePage({ params }: { params: { caseId: string } }) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-display text-lg tracking-wide text-white">{lootCase.name}</div>
-            <div className="text-sm text-white/60">Открытие на сервере. Забирай предмет или продавай за баланс.</div>
+            <div className="text-sm text-white/60">Открытие на сервере. Забирай предмет в инвентарь или продавай за баланс.</div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="pill">{lootCase.itemIds.length} предметов</span>
             <span className="pill">{lootCase.price} ₽</span>
           </div>

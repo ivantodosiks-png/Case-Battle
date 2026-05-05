@@ -12,8 +12,8 @@
   --text: rgba(231, 238, 247, 0.92);
   --muted: rgba(231, 238, 247, 0.62);
   --muted2: rgba(231, 238, 247, 0.45);
-  --accent: #ff7a18; /* neon orange */
-  --accent2: #3b82f6; /* cold blue */
+  --accent: #ff6a1a; /* neon orange */
+  --accent2: #60a5fa; /* cold blue */
   --danger: #ef4444;
 }
 
@@ -27,9 +27,9 @@ body {
 body {
   font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans",
     sans-serif;
-  background: radial-gradient(1200px 700px at 18% 12%, rgba(59, 130, 246, 0.18), transparent 60%),
+  background: radial-gradient(1200px 700px at 18% 12%, rgba(96, 165, 250, 0.16), transparent 60%),
     radial-gradient(1000px 650px at 82% 18%, rgba(148, 163, 184, 0.08), transparent 55%),
-    radial-gradient(900px 600px at 55% 92%, rgba(255, 122, 24, 0.08), transparent 55%),
+    radial-gradient(900px 600px at 55% 92%, rgba(255, 106, 26, 0.10), transparent 55%),
     linear-gradient(180deg, var(--bg0), var(--bg1));
   color: var(--text);
   overflow-x: clip;

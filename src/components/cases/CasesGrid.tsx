@@ -72,6 +72,8 @@ export function CasesGrid({ cases }: { cases: LootCase[] }) {
                   background: `radial-gradient(900px 300px at 20% 10%, ${c.image.to}30, transparent 55%), radial-gradient(700px 260px at 70% 80%, ${c.image.from}22, transparent 60%)`,
                 }}
               />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/25 to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/30 to-transparent" />
 
               <div className="relative flex items-start justify-between gap-3">
                 <div>
@@ -85,7 +87,7 @@ export function CasesGrid({ cases }: { cases: LootCase[] }) {
                   onClick={() => toggle(c.id)}
                   className={cn(
                     "rounded-xl px-2.5 py-2 text-xs ring-1 ring-white/10 transition",
-                    isFav ? "bg-white text-black" : "bg-black/20 text-white/70 hover:text-white",
+                    isFav ? "bg-accent text-black ring-accent/30" : "bg-black/20 text-white/70 hover:text-white",
                   )}
                   aria-label={isFav ? "Убрать из избранного" : "Добавить в избранное"}
                 >
@@ -111,4 +113,3 @@ export function CasesGrid({ cases }: { cases: LootCase[] }) {
     </div>
   );
 }
-
