@@ -12,8 +12,8 @@ export default function InventoryPage() {
   const applyUpdate = useSessionStore((s) => s.applyUpdate);
   const [items, setItems] = useState<Item[]>([]);
 
-  const selected = useUpgradeStore((s) => s.selectedItemIds);
-  const toggle = useUpgradeStore((s) => s.toggleSelected);
+  const betItemId = useUpgradeStore((s) => s.betItemId);
+  const setBetItem = useUpgradeStore((s) => s.setBetItem);
 
   const [q, setQ] = useState("");
   const [rarity, setRarity] = useState<Rarity | "all">("all");
@@ -64,10 +64,10 @@ export default function InventoryPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-display text-lg tracking-wide text-white">Инвентарь</div>
-            <div className="text-sm text-white/60">Выбирай до 6 предметов для апгрейда или продавай за баланс.</div>
+            <div className="text-sm text-white/60">Выбирай предмет для апгрейда или продавай за баланс.</div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="pill">Выбрано: {selected.length}/6</span>
+            <span className="pill">Выбран: {betItemId ? "1" : "0"}</span>
             <span className="pill">Предметов: {items.length}</span>
           </div>
         </div>
@@ -121,18 +121,18 @@ export default function InventoryPage() {
               <ItemCard
                 key={it.id}
                 item={it}
-                selected={selected.includes(it.id)}
-                onSelect={() => toggle(it.id)}
+                selected={it.id === betItemId}
+                onSelect={() => setBetItem(it.id === betItemId ? null : it.id)}
                 actions={
                   <div className="flex gap-2">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggle(it.id);
+                        setBetItem(it.id === betItemId ? null : it.id);
                       }}
                       className="btn btn-primary flex-1 px-2 py-1 text-xs"
                     >
-                      {selected.includes(it.id) ? "Убрать" : "Выбрать"}
+                      {it.id === betItemId ? "Убрать" : "Выбрать"}
                     </button>
                     <button
                       onClick={(e) => {
@@ -156,4 +156,3 @@ export default function InventoryPage() {
     </div>
   );
 }
-

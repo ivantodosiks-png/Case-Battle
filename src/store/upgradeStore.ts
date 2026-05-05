@@ -3,28 +3,28 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type UpgradeMode =
+  | { kind: "mult"; value: 2 | 5 | 10 }
+  | { kind: "chance"; value: 75 | 50 | 30 };
+
 type UpgradeState = {
-  selectedItemIds: string[];
-  targetItemId: string | null;
-  toggleSelected: (id: string) => void;
-  clearSelected: () => void;
-  setTarget: (id: string | null) => void;
+  betItemId: string | null;
+  mode: UpgradeMode;
+  setBetItem: (id: string | null) => void;
+  setMode: (mode: UpgradeMode) => void;
+  clear: () => void;
 };
 
 export const useUpgradeStore = create<UpgradeState>()(
   persist(
     (set) => ({
-      selectedItemIds: [],
-      targetItemId: null,
-      toggleSelected: (id) =>
-        set((s) => {
-          const has = s.selectedItemIds.includes(id);
-          const next = has ? s.selectedItemIds.filter((x) => x !== id) : [id, ...s.selectedItemIds].slice(0, 6);
-          return { selectedItemIds: next };
-        }),
-      clearSelected: () => set({ selectedItemIds: [] }),
-      setTarget: (id) => set({ targetItemId: id }),
+      betItemId: null,
+      mode: { kind: "mult", value: 2 },
+      setBetItem: (id) => set({ betItemId: id }),
+      setMode: (mode) => set({ mode }),
+      clear: () => set({ betItemId: null }),
     }),
-    { name: "skinforge_upgrade_v1", partialize: (s) => ({ selectedItemIds: s.selectedItemIds, targetItemId: s.targetItemId }) },
+    { name: "skinforge_upgrade_v2", partialize: (s) => ({ betItemId: s.betItemId, mode: s.mode }) },
   ),
 );
+

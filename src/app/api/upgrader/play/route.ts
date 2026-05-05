@@ -4,42 +4,40 @@ import { requireState, withNewToken } from "@/lib/server/apiState";
 import { getItem } from "@/lib/game/catalog";
 import { playUpgradeResult } from "@/lib/server/gameLogic";
 
-type Body = { selectedItemIds?: string[]; targetItemId?: string };
+type UpgradeMode =
+  | { kind: "mult"; value: 2 | 5 | 10 }
+  | { kind: "chance"; value: 75 | 50 | 30 };
+
+type Body = { betItemId?: string; mode?: UpgradeMode };
 
 export async function POST(req: NextRequest) {
   const { state } = await requireState(req);
   const body = (await req.json().catch(() => null)) as Body | null;
 
-  const selected = body?.selectedItemIds ?? [];
-  const targetId = body?.targetItemId;
-  if (!targetId) return NextResponse.json({ success: false, error: "targetItemId required" }, { status: 400 });
-  if (!Array.isArray(selected) || selected.length === 0) {
-    return NextResponse.json({ success: false, error: "selectedItemIds required" }, { status: 400 });
-  }
-  if (selected.length > 6) return NextResponse.json({ success: false, error: "Max 6 items" }, { status: 400 });
+  const betItemId = body?.betItemId;
+  const mode = body?.mode;
+  if (!betItemId) return NextResponse.json({ success: false, error: "betItemId required" }, { status: 400 });
+  if (!mode) return NextResponse.json({ success: false, error: "mode required" }, { status: 400 });
 
-  const uniq = Array.from(new Set(selected));
-  if (uniq.length !== selected.length) return NextResponse.json({ success: false, error: "Duplicate items" }, { status: 400 });
-
-  const hasAll = uniq.every((id) => state.inventoryItemIds.includes(id));
-  if (!hasAll) return NextResponse.json({ success: false, error: "Some items not in inventory" }, { status: 400 });
-
-  const targetItem = getItem(targetId);
-  if (!targetItem) return NextResponse.json({ success: false, error: "Unknown target" }, { status: 404 });
-
-  // Prevent "bet more expensive than target" (as required)
-  const betValue = uniq.map((id) => getItem(id)!).reduce((acc, it) => acc + it.price, 0);
-  if (betValue >= targetItem.price) {
-    return NextResponse.json({ success: false, error: "Bet must be cheaper than target" }, { status: 400 });
+  if (state.upgradeLockUntil && Date.now() < state.upgradeLockUntil) {
+    return NextResponse.json({ success: false, error: "Upgrade in progress" }, { status: 429 });
   }
 
-  const result = playUpgradeResult(uniq, targetId);
+  if (!state.inventoryItemIds.includes(betItemId)) {
+    return NextResponse.json({ success: false, error: "Item not in inventory" }, { status: 400 });
+  }
+
+  const betItem = getItem(betItemId);
+  if (!betItem) return NextResponse.json({ success: false, error: "Unknown bet item" }, { status: 404 });
+
+  const result = playUpgradeResult(betItemId, mode);
   const now = Date.now();
 
-  const inventoryAfterLoss = state.inventoryItemIds.filter((id) => !uniq.includes(id));
+  const inventoryAfterLoss = state.inventoryItemIds.filter((id) => id !== betItemId);
 
   const updated = {
     ...state,
+    upgradeLockUntil: now + 4500,
     balance: state.balance + (result.won ? 0 : result.cashback.amount),
     inventoryItemIds: result.won ? [result.targetItem.id, ...inventoryAfterLoss] : inventoryAfterLoss,
     history: [
@@ -47,14 +45,15 @@ export async function POST(req: NextRequest) {
         id: crypto.randomUUID(),
         type: "upgrade" as const,
         createdAt: now,
-        betValue: result.betValue,
+        betValue: betItem.price,
         resultValue: result.targetItem.price,
         won: result.won,
         cashback: result.cashback.amount,
         meta: {
           chance: result.chance,
           roll: result.roll,
-          selectedItemIds: uniq,
+          betItemId,
+          mode,
           targetItemId: result.targetItem.id,
           cashbackPercent: result.cashback.percent,
         },
@@ -90,7 +89,7 @@ export async function POST(req: NextRequest) {
     chance: result.chance,
     roll: result.roll,
     targetItem: result.targetItem,
-    lostItems: uniq.map((id) => getItem(id)).filter(Boolean),
+    betItem,
     cashback: result.cashback,
     balance: newState.balance,
   });

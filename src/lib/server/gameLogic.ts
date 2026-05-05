@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { getDropTable, getItem } from "@/lib/game/catalog";
+import { catalog, getDropTable, getItem } from "@/lib/game/catalog";
 
 function secureFloat01() {
   // crypto.randomInt is cryptographically secure.
@@ -45,45 +45,94 @@ export function clampChance(chance: number) {
   return Math.max(1, Math.min(95, chance));
 }
 
-export function playUpgradeResult(betItemIds: string[], targetItemId: string) {
-  const target = getItem(targetItemId);
-  if (!target) throw new Error("Unknown target");
+type UpgradeMode =
+  | { kind: "mult"; value: 2 | 5 | 10 }
+  | { kind: "chance"; value: 75 | 50 | 30 };
 
-  const betItems = betItemIds.map((id) => {
-    const it = getItem(id);
-    if (!it) throw new Error("Unknown bet item");
-    return it;
-  });
+function isUpgradeMode(x: unknown): x is UpgradeMode {
+  if (!x || typeof x !== "object") return false;
+  const m = x as { kind?: unknown; value?: unknown };
+  if (m.kind === "mult") return m.value === 2 || m.value === 5 || m.value === 10;
+  if (m.kind === "chance") return m.value === 75 || m.value === 50 || m.value === 30;
+  return false;
+}
 
-  const betValue = betItems.reduce((acc, it) => acc + it.price, 0);
-  const targetValue = target.price;
+function modeToChanceAndTargetValue(betValue: number, mode: UpgradeMode) {
+  if (mode.kind === "mult") {
+    const multiplier = mode.value;
+    const chance = clampChance(100 / multiplier);
+    const targetValue = Math.max(betValue + 1, Math.round(betValue * multiplier));
+    return { chance, multiplier, targetValue };
+  }
 
-  if (betValue <= 0) throw new Error("Invalid bet");
-  if (betValue >= targetValue) throw new Error("Bet must be cheaper than target");
+  // fixed chance: target value derived from chance
+  const chance = clampChance(mode.value);
+  const multiplier = 100 / chance;
+  const targetValue = Math.max(betValue + 1, Math.round(betValue / (chance / 100)));
+  return { chance, multiplier, targetValue };
+}
 
-  // chance = bet / target * 100
-  const rawChance = (betValue / targetValue) * 100;
-  const chance = clampChance(rawChance);
+export function pickUpgradeTargetByValue(targetValue: number, betValue: number) {
+  // Prefer items that are >= betValue+1, then choose closest to targetValue (ties -> cheaper).
+  // If nothing above bet exists, fallback to the most expensive item.
+  const pool = catalog.items.filter((it) => it.price > betValue);
+  const list = pool.length ? pool : catalog.items.slice();
+
+  let best = list[0]!;
+  let bestDist = Math.abs(best.price - targetValue);
+  for (const it of list) {
+    const dist = Math.abs(it.price - targetValue);
+    if (dist < bestDist || (dist === bestDist && it.price < best.price)) {
+      best = it;
+      bestDist = dist;
+    }
+  }
+  return best;
+}
+
+export function quoteUpgradeResult(betItemId: string, modeRaw: unknown) {
+  if (!isUpgradeMode(modeRaw)) throw new Error("Invalid mode");
+  const betItem = getItem(betItemId);
+  if (!betItem) throw new Error("Unknown bet item");
+
+  const betValue = betItem.price;
+  const { chance, multiplier, targetValue } = modeToChanceAndTargetValue(betValue, modeRaw);
+  const targetItem = pickUpgradeTargetByValue(targetValue, betValue);
+
+  // expected cashback range (1..5%)
+  const cashbackMin = Math.floor((betValue * 1) / 100);
+  const cashbackMax = Math.floor((betValue * 5) / 100);
+
+  return {
+    betItem,
+    betValue,
+    mode: modeRaw,
+    chance,
+    multiplier,
+    targetItem,
+    targetValue: targetItem.price,
+    cashbackRange: { minPercent: 1, maxPercent: 5, minAmount: cashbackMin, maxAmount: cashbackMax },
+  };
+}
+
+export function playUpgradeResult(betItemId: string, modeRaw: unknown) {
+  const quoted = quoteUpgradeResult(betItemId, modeRaw);
 
   // Secure random roll in [0,100)
   const roll = secureFloat01() * 100;
-  const won = roll <= chance;
+  const won = roll <= quoted.chance;
 
   let cashbackPercent = 0;
   let cashbackAmount = 0;
   if (!won) {
-    // Cashback percent random 1..5
     cashbackPercent = crypto.randomInt(1, 6);
-    cashbackAmount = Math.floor((betValue * cashbackPercent) / 100);
+    cashbackAmount = Math.floor((quoted.betValue * cashbackPercent) / 100);
   }
 
   return {
+    ...quoted,
     won,
-    chance,
     roll,
-    betValue,
-    targetItem: target,
     cashback: { percent: cashbackPercent, amount: cashbackAmount },
   };
 }
-

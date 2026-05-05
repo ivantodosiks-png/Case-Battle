@@ -69,6 +69,7 @@ export function makeInitialState(): SignedState {
     },
     balance: 1000,
     inventoryItemIds: inventory,
+    upgradeLockUntil: 0,
     history: [],
     liveDrops: [],
     stats: {
@@ -79,4 +80,3 @@ export function makeInitialState(): SignedState {
     },
   };
 }
-
