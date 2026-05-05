@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { cn } from "@/lib/cn";
-import { LiveDropSidebar } from "./LiveDropSidebar";
 import { useSessionStore } from "@/store/sessionStore";
 import { Flame, PackageOpen, Sparkles, User, History, Backpack, Gift, Shield } from "lucide-react";
 
@@ -31,8 +30,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/25 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/35 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center gap-3 px-4 py-3">
           <Link href="/" className="group flex items-center gap-2">
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10 ring-soft">
               <Flame className="h-5 w-5 text-white" />
@@ -74,17 +73,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-[280px_1fr]">
-        <aside className="hidden lg:block">
-          <div className="glass rounded-2xl ring-soft">
-            <LiveDropSidebar />
-          </div>
-        </aside>
+      <div className="mx-auto w-full max-w-[1600px] px-4 py-4">
         <main className="min-w-0">{children}</main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/35 backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-7xl grid-cols-5 gap-1 px-2 py-2">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/45 backdrop-blur md:hidden">
+        <div className="mx-auto grid w-full max-w-[1600px] grid-cols-5 gap-1 px-2 py-2">
           {nav.slice(0, 5).map((n) => {
             const active = pathname === n.href;
             const Icon = n.icon;
@@ -108,4 +102,3 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-

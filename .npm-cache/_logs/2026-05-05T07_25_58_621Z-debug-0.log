@@ -1,0 +1,186 @@
+0 verbose cli C:\nvm4w\nodejs\node.exe C:\nvm4w\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.6.2
+2 info using node@v24.13.0
+3 silly config load:file:C:\Users\Administrator\AppData\Local\nvm\v24.13.0\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\Administrator\OneDrive - Innlandet fylkeskommune\Skrivebord\Case-Battle\.npmrc
+5 silly config load:file:C:\Users\Administrator\.npmrc
+6 silly config load:file:C:\nvm4w\nodejs\etc\npmrc
+7 verbose title npm install prisma @prisma/client
+8 verbose argv "install" "prisma" "@prisma/client"
+9 verbose logfile logs-max:10 dir:C:\Users\Administrator\OneDrive - Innlandet fylkeskommune\Skrivebord\Case-Battle\.npm-cache\_logs\2026-05-05T07_25_58_621Z-
+10 verbose logfile C:\Users\Administrator\OneDrive - Innlandet fylkeskommune\Skrivebord\Case-Battle\.npm-cache\_logs\2026-05-05T07_25_58_621Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+14 silly idealTree buildDeps
+15 silly fetch manifest prisma@*
+16 silly packumentCache full:https://registry.npmjs.org/prisma cache-miss
+17 http fetch GET https://registry.npmjs.org/prisma attempt 1 failed with EACCES
+18 http fetch GET https://registry.npmjs.org/prisma attempt 2 failed with EACCES
+19 http fetch GET https://registry.npmjs.org/prisma attempt 3 failed with EACCES
+20 http fetch GET 200 https://registry.npmjs.org/prisma 70262ms (cache stale)
+21 silly packumentCache full:https://registry.npmjs.org/prisma set size:43213814 disposed:false
+22 silly fetch manifest better-sqlite3@>=9.0.0
+23 silly packumentCache full:https://registry.npmjs.org/better-sqlite3 cache-miss
+24 http fetch GET https://registry.npmjs.org/better-sqlite3 attempt 1 failed with EACCES
+25 http fetch GET https://registry.npmjs.org/better-sqlite3 attempt 2 failed with EACCES
+26 http fetch GET https://registry.npmjs.org/better-sqlite3 attempt 3 failed with EACCES
+27 http fetch GET 200 https://registry.npmjs.org/better-sqlite3 70056ms (cache stale)
+28 silly packumentCache full:https://registry.npmjs.org/better-sqlite3 set size:374702 disposed:false
+29 silly fetch manifest typescript@^5
+30 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+31 http fetch GET https://registry.npmjs.org/typescript attempt 1 failed with EACCES
+32 http fetch GET https://registry.npmjs.org/typescript attempt 2 failed with EACCES
+33 http fetch GET https://registry.npmjs.org/typescript attempt 3 failed with EACCES
+34 http fetch GET 200 https://registry.npmjs.org/typescript 70144ms (cache stale)
+35 silly packumentCache full:https://registry.npmjs.org/typescript set size:15409943 disposed:false
+36 silly fetch manifest @prisma/client@*
+37 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient cache-miss
+38 http fetch GET https://registry.npmjs.org/@prisma%2fclient attempt 1 failed with EACCES
+39 http fetch GET https://registry.npmjs.org/@prisma%2fclient attempt 2 failed with EACCES
+40 http fetch GET https://registry.npmjs.org/@prisma%2fclient attempt 3 failed with EACCES
+41 http fetch GET 200 https://registry.npmjs.org/@prisma%2fclient 70353ms (cache stale)
+42 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient set size:67782950 disposed:false
+43 silly placeDep ROOT @prisma/client@7.8.0 OK for: skinforge@0.1.0 want: *
+44 silly placeDep ROOT prisma@7.8.0 OK for: skinforge@0.1.0 want: *
+45 silly fetch manifest @prisma/client-runtime-utils@7.8.0
+46 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient-runtime-utils cache-miss
+47 silly fetch manifest mysql2@3.15.3
+48 silly packumentCache full:https://registry.npmjs.org/mysql2 cache-miss
+49 silly fetch manifest postgres@3.4.7
+50 silly packumentCache full:https://registry.npmjs.org/postgres cache-miss
+51 silly fetch manifest @prisma/dev@0.24.3
+52 silly packumentCache full:https://registry.npmjs.org/@prisma%2fdev cache-miss
+53 silly fetch manifest @prisma/config@7.8.0
+54 silly packumentCache full:https://registry.npmjs.org/@prisma%2fconfig cache-miss
+55 silly fetch manifest @prisma/engines@7.8.0
+56 silly packumentCache full:https://registry.npmjs.org/@prisma%2fengines cache-miss
+57 silly fetch manifest @prisma/studio-core@0.27.3
+58 silly packumentCache full:https://registry.npmjs.org/@prisma%2fstudio-core cache-miss
+59 http fetch GET https://registry.npmjs.org/@prisma%2fclient-runtime-utils attempt 1 failed with EACCES
+60 http fetch GET https://registry.npmjs.org/@prisma%2fconfig attempt 1 failed with EACCES
+61 http fetch GET https://registry.npmjs.org/mysql2 attempt 1 failed with EACCES
+62 http fetch GET https://registry.npmjs.org/postgres attempt 1 failed with EACCES
+63 http fetch GET https://registry.npmjs.org/@prisma%2fdev attempt 1 failed with EACCES
+64 http fetch GET https://registry.npmjs.org/@prisma%2fstudio-core attempt 1 failed with EACCES
+65 http fetch GET https://registry.npmjs.org/@prisma%2fengines attempt 1 failed with EACCES
+66 http fetch GET https://registry.npmjs.org/@prisma%2fclient-runtime-utils attempt 2 failed with EACCES
+67 http fetch GET https://registry.npmjs.org/@prisma%2fconfig attempt 2 failed with EACCES
+68 http fetch GET https://registry.npmjs.org/mysql2 attempt 2 failed with EACCES
+69 http fetch GET https://registry.npmjs.org/postgres attempt 2 failed with EACCES
+70 http fetch GET https://registry.npmjs.org/@prisma%2fdev attempt 2 failed with EACCES
+71 http fetch GET https://registry.npmjs.org/@prisma%2fstudio-core attempt 2 failed with EACCES
+72 http fetch GET https://registry.npmjs.org/@prisma%2fengines attempt 2 failed with EACCES
+73 http fetch GET https://registry.npmjs.org/@prisma%2fconfig attempt 3 failed with EACCES
+74 http fetch GET https://registry.npmjs.org/@prisma%2fclient-runtime-utils attempt 3 failed with EACCES
+75 http fetch GET https://registry.npmjs.org/mysql2 attempt 3 failed with EACCES
+76 http fetch GET https://registry.npmjs.org/postgres attempt 3 failed with EACCES
+77 http fetch GET https://registry.npmjs.org/@prisma%2fdev attempt 3 failed with EACCES
+78 http fetch GET https://registry.npmjs.org/@prisma%2fstudio-core attempt 3 failed with EACCES
+79 http fetch GET https://registry.npmjs.org/@prisma%2fengines attempt 3 failed with EACCES
+80 http fetch GET 200 https://registry.npmjs.org/postgres 70189ms (cache stale)
+81 silly packumentCache full:https://registry.npmjs.org/postgres set size:185872 disposed:false
+82 http fetch GET 200 https://registry.npmjs.org/mysql2 70195ms (cache stale)
+83 silly packumentCache full:https://registry.npmjs.org/mysql2 set size:849175 disposed:false
+84 http fetch GET 200 https://registry.npmjs.org/@prisma%2fclient-runtime-utils 70211ms (cache stale)
+85 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient-runtime-utils set size:1066540 disposed:false
+86 http fetch GET 200 https://registry.npmjs.org/@prisma%2fdev 70226ms (cache stale)
+87 silly packumentCache full:https://registry.npmjs.org/@prisma%2fdev set size:2597491 disposed:false
+88 http fetch GET 200 https://registry.npmjs.org/@prisma%2fconfig 70258ms (cache stale)
+89 silly packumentCache full:https://registry.npmjs.org/@prisma%2fconfig set size:3769368 disposed:false
+90 http fetch GET 200 https://registry.npmjs.org/@prisma%2fengines 70345ms (cache stale)
+91 silly packumentCache full:https://registry.npmjs.org/@prisma%2fengines set size:21750827 disposed:false
+92 http fetch GET 200 https://registry.npmjs.org/@prisma%2fstudio-core 70591ms (cache stale)
+93 silly packumentCache full:https://registry.npmjs.org/@prisma%2fstudio-core set size:7175105 disposed:false
+94 silly placeDep ROOT @prisma/client-runtime-utils@7.8.0 OK for: @prisma/client@7.8.0 want: 7.8.0
+95 silly fetch manifest @types/react@^18.0.0 || ^19.0.0
+96 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+97 http fetch GET https://registry.npmjs.org/@types%2freact attempt 1 failed with EACCES
+98 http fetch GET https://registry.npmjs.org/@types%2freact attempt 2 failed with EACCES
+99 http fetch GET https://registry.npmjs.org/@types%2freact attempt 3 failed with EACCES
+100 http fetch GET 200 https://registry.npmjs.org/@types%2freact 70070ms (cache stale)
+101 silly packumentCache full:https://registry.npmjs.org/@types%2freact set size:2588964 disposed:false
+102 silly fetch manifest react@^18.0.0 || ^19.0.0
+103 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+104 http fetch GET https://registry.npmjs.org/react attempt 1 failed with EACCES
+105 http fetch GET https://registry.npmjs.org/react attempt 2 failed with EACCES
+106 http fetch GET https://registry.npmjs.org/react attempt 3 failed with EACCES
+107 http fetch GET 200 https://registry.npmjs.org/react 70096ms (cache stale)
+108 silly packumentCache full:https://registry.npmjs.org/react set size:6633619 disposed:false
+109 silly fetch manifest react-dom@^18.0.0 || ^19.0.0
+110 silly packumentCache full:https://registry.npmjs.org/react-dom cache-miss
+111 http fetch GET https://registry.npmjs.org/react-dom attempt 1 failed with EACCES
+112 http fetch GET https://registry.npmjs.org/react-dom attempt 2 failed with EACCES
+113 http fetch GET https://registry.npmjs.org/react-dom attempt 3 failed with EACCES
+114 http fetch GET 200 https://registry.npmjs.org/react-dom 70099ms (cache stale)
+115 silly packumentCache full:https://registry.npmjs.org/react-dom set size:8839555 disposed:false
+116 silly placeDep ROOT @prisma/config@7.8.0 OK for: prisma@7.8.0 want: 7.8.0
+117 silly placeDep ROOT @prisma/dev@0.24.3 OK for: prisma@7.8.0 want: 0.24.3
+118 silly placeDep ROOT @prisma/engines@7.8.0 OK for: prisma@7.8.0 want: 7.8.0
+119 silly placeDep ROOT @prisma/studio-core@0.27.3 OK for: prisma@7.8.0 want: 0.27.3
+120 silly placeDep ROOT mysql2@3.15.3 OK for: prisma@7.8.0 want: 3.15.3
+121 silly placeDep ROOT postgres@3.4.7 OK for: prisma@7.8.0 want: 3.4.7
+122 silly fetch manifest c12@3.3.4
+123 silly packumentCache full:https://registry.npmjs.org/c12 cache-miss
+124 silly fetch manifest effect@3.20.0
+125 silly packumentCache full:https://registry.npmjs.org/effect cache-miss
+126 silly fetch manifest empathic@2.0.0
+127 silly packumentCache full:https://registry.npmjs.org/empathic cache-miss
+128 silly fetch manifest deepmerge-ts@7.1.5
+129 silly packumentCache full:https://registry.npmjs.org/deepmerge-ts cache-miss
+130 silly fetch manifest hono@^4.12.8
+131 silly packumentCache full:https://registry.npmjs.org/hono cache-miss
+132 silly fetch manifest pathe@2.0.3
+133 silly packumentCache full:https://registry.npmjs.org/pathe cache-miss
+134 silly fetch manifest remeda@2.33.4
+135 silly packumentCache full:https://registry.npmjs.org/remeda cache-miss
+136 silly fetch manifest std-env@3.10.0
+137 silly packumentCache full:https://registry.npmjs.org/std-env cache-miss
+138 silly fetch manifest valibot@1.2.0
+139 silly packumentCache full:https://registry.npmjs.org/valibot cache-miss
+140 silly fetch manifest zeptomatch@2.1.0
+141 silly packumentCache full:https://registry.npmjs.org/zeptomatch cache-miss
+142 silly fetch manifest get-port-please@3.2.0
+143 silly packumentCache full:https://registry.npmjs.org/get-port-please cache-miss
+144 silly fetch manifest proper-lockfile@4.1.2
+145 silly packumentCache full:https://registry.npmjs.org/proper-lockfile cache-miss
+146 silly fetch manifest @hono/node-server@1.19.11
+147 silly packumentCache full:https://registry.npmjs.org/@hono%2fnode-server cache-miss
+148 silly fetch manifest http-status-codes@2.3.0
+149 silly packumentCache full:https://registry.npmjs.org/http-status-codes cache-miss
+150 silly fetch manifest @electric-sql/pglite@0.4.1
+151 silly packumentCache full:https://registry.npmjs.org/@electric-sql%2fpglite cache-miss
+152 silly fetch manifest @prisma/get-platform@7.2.0
+153 silly packumentCache full:https://registry.npmjs.org/@prisma%2fget-platform cache-miss
+154 silly fetch manifest @prisma/streams-local@0.1.2
+155 silly packumentCache full:https://registry.npmjs.org/@prisma%2fstreams-local cache-miss
+156 http fetch GET https://registry.npmjs.org/c12 attempt 1 failed with EACCES
+157 http fetch GET https://registry.npmjs.org/empathic attempt 1 failed with EACCES
+158 http fetch GET https://registry.npmjs.org/pathe attempt 1 failed with EACCES
+159 http fetch GET https://registry.npmjs.org/hono attempt 1 failed with EACCES
+160 http fetch GET https://registry.npmjs.org/deepmerge-ts attempt 1 failed with EACCES
+161 http fetch GET https://registry.npmjs.org/remeda attempt 1 failed with EACCES
+162 http fetch GET https://registry.npmjs.org/get-port-please attempt 1 failed with EACCES
+163 http fetch GET https://registry.npmjs.org/effect attempt 1 failed with EACCES
+164 http fetch GET https://registry.npmjs.org/zeptomatch attempt 1 failed with EACCES
+165 http fetch GET https://registry.npmjs.org/std-env attempt 1 failed with EACCES
+166 http fetch GET https://registry.npmjs.org/valibot attempt 1 failed with EACCES
+167 http fetch GET https://registry.npmjs.org/@prisma%2fget-platform attempt 1 failed with EACCES
+168 http fetch GET https://registry.npmjs.org/@hono%2fnode-server attempt 1 failed with EACCES
+169 http fetch GET https://registry.npmjs.org/proper-lockfile attempt 1 failed with EACCES
+170 http fetch GET https://registry.npmjs.org/http-status-codes attempt 1 failed with EACCES
+171 http fetch GET https://registry.npmjs.org/c12 attempt 2 failed with EACCES
+172 http fetch GET https://registry.npmjs.org/empathic attempt 2 failed with EACCES
+173 http fetch GET https://registry.npmjs.org/pathe attempt 2 failed with EACCES
+174 http fetch GET https://registry.npmjs.org/hono attempt 2 failed with EACCES
+175 http fetch GET https://registry.npmjs.org/deepmerge-ts attempt 2 failed with EACCES
+176 http fetch GET https://registry.npmjs.org/remeda attempt 2 failed with EACCES
+177 http fetch GET https://registry.npmjs.org/get-port-please attempt 2 failed with EACCES
+178 http fetch GET https://registry.npmjs.org/effect attempt 2 failed with EACCES
+179 http fetch GET https://registry.npmjs.org/zeptomatch attempt 2 failed with EACCES
+180 http fetch GET https://registry.npmjs.org/std-env attempt 2 failed with EACCES
+181 http fetch GET https://registry.npmjs.org/valibot attempt 2 failed with EACCES
+182 http fetch GET https://registry.npmjs.org/@prisma%2fget-platform attempt 2 failed with EACCES
+183 http fetch GET https://registry.npmjs.org/@hono%2fnode-server attempt 2 failed with EACCES
+184 http fetch GET https://registry.npmjs.org/proper-lockfile attempt 2 failed with EACCES
+185 http fetch GET https://registry.npmjs.org/http-status-codes attempt 2 failed with EACCES

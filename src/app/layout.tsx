@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${orbitron.variable} antialiased font-sans`}
+        className={`${inter.variable} ${orbitron.variable} antialiased font-sans overflow-x-clip`}
       >
         <AppShell>{children}</AppShell>
       </body>

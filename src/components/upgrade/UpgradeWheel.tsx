@@ -22,44 +22,45 @@ export function UpgradeWheel({
   // Filled segment starts from bottom (270deg) and goes clockwise.
   const fillStyle = useMemo(() => {
     return {
-      background: `conic-gradient(from 270deg, #22c55e 0deg ${winDeg}deg, rgba(255,255,255,0.08) 0deg)`,
-      boxShadow: "0 0 0 1px rgba(255,255,255,0.05), 0 0 56px rgba(124,58,237,0.18)",
+      background: `conic-gradient(from 270deg, rgba(255,122,24,0.95) 0deg ${winDeg}deg, rgba(255,255,255,0.08) 0deg)`,
+      boxShadow: "0 0 0 1px rgba(255,255,255,0.06), 0 0 64px rgba(255,122,24,0.14)",
     } as const;
   }, [winDeg]);
 
   const stopDeg = stopRoll == null ? 0 : (Math.max(0, Math.min(100, stopRoll)) / 100) * 360;
 
-  // Arrow points outwards from the center, orbiting around the wheel.
-  // We rotate the arrow container so the arrow lands at the roll angle, with bottom as 0 reference.
-  // Default arrow points to top (0deg). Bottom is 180deg.
-  const targetRotation = normDeg(180 + stopDeg);
+  // We rotate the wheel itself; indicator stays fixed at the top.
+  // Roll angle is measured from bottom, clockwise -> bring it to top via -(180 + stopDeg).
+  const targetRotation = -normDeg(180 + stopDeg);
 
   return (
     <div className="relative grid place-items-center">
       <div className="relative h-56 w-56">
-        <div className="absolute inset-0 rounded-full ring-1 ring-white/10" style={fillStyle} />
-        <div className="absolute inset-4 rounded-full bg-[#0b1020]/70 ring-1 ring-white/10" />
+        <div className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2">
+          <div className="h-0 w-0 border-x-[10px] border-x-transparent border-b-[16px] border-b-accent drop-shadow-[0_0_22px_rgba(255,122,24,0.75)]" />
+        </div>
+
+        <motion.div
+          className="absolute inset-0 rounded-full"
+          initial={false}
+          animate={spinning ? { rotate: 360 * 7 + targetRotation } : { rotate: targetRotation }}
+          transition={spinning ? { duration: 4.2, ease: [0.12, 0.92, 0.18, 1] } : { duration: 0.2 }}
+        >
+          <div className="absolute inset-0 rounded-full ring-1 ring-white/10" style={fillStyle} />
+          <div className="absolute inset-0 rounded-full [mask-image:radial-gradient(circle_at_center,transparent_55%,black_56%)] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.18),transparent_55%)]" />
+          <div className="absolute inset-2 rounded-full ring-1 ring-white/5" />
+          <div className="absolute inset-0 rounded-full [mask-image:radial-gradient(circle_at_center,transparent_60%,black_61%)] bg-[conic-gradient(from_0deg,rgba(255,255,255,0.0)_0deg,rgba(255,255,255,0.10)_6deg,rgba(255,255,255,0.0)_12deg)] opacity-80" />
+        </motion.div>
+
+        <div className="absolute inset-4 rounded-full bg-black/35 ring-1 ring-white/10" />
 
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-center">
-            <div className="text-xs text-white/55">Шанс</div>
+            <div className="text-xs text-white/55">ШАНС</div>
             <div className="font-display text-2xl text-white">{Math.round(chance)}%</div>
           </div>
         </div>
 
-        <motion.div
-          className="absolute inset-0"
-          initial={false}
-          animate={spinning ? { rotate: 360 * 6 + targetRotation } : { rotate: targetRotation }}
-          transition={spinning ? { duration: 4.2, ease: [0.12, 0.92, 0.18, 1] } : { duration: 0.2 }}
-        >
-          <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2">
-            <div className="absolute -top-[112px] left-1/2 h-[112px] w-[2px] -translate-x-1/2 bg-accent/70 shadow-[0_0_26px_rgba(124,58,237,0.35)]" />
-            <div className="absolute -top-[120px] left-1/2 -translate-x-1/2">
-              <div className="h-0 w-0 border-x-[9px] border-x-transparent border-b-[14px] border-b-accent drop-shadow-[0_0_20px_rgba(124,58,237,0.65)]" />
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );

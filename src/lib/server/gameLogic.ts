@@ -115,8 +115,31 @@ export function quoteUpgradeResult(betItemId: string, modeRaw: unknown) {
   };
 }
 
-export function playUpgradeResult(betItemId: string, modeRaw: unknown) {
+export function quoteUpgradeResultWithTarget(betItemId: string, modeRaw: unknown, targetItemId: string | null) {
   const quoted = quoteUpgradeResult(betItemId, modeRaw);
+  if (!targetItemId) return quoted;
+
+  const target = getItem(targetItemId);
+  if (!target) throw new Error("Unknown target");
+
+  // Tolerance: allow ~±20% from expected target for chosen mode.
+  const expected = quoted.targetValue;
+  const tol = 0.2;
+  const min = Math.floor(expected * (1 - tol));
+  const max = Math.ceil(expected * (1 + tol));
+  if (target.price < min || target.price > max) throw new Error("Target not allowed for mode");
+
+  return {
+    ...quoted,
+    targetItem: target,
+    targetValue: target.price,
+    // keep chance from mode (not from target), but expose actual multiplier for UI
+    multiplier: target.price / Math.max(1, quoted.betValue),
+  };
+}
+
+export function playUpgradeResult(betItemId: string, modeRaw: unknown, targetItemId: string | null) {
+  const quoted = quoteUpgradeResultWithTarget(betItemId, modeRaw, targetItemId);
 
   // Secure random roll in [0,100)
   const roll = secureFloat01() * 100;

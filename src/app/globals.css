@@ -3,33 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --bg0: #070a12;
-  --bg1: #0b1020;
-  --panel: rgba(255, 255, 255, 0.06);
-  --card: rgba(255, 255, 255, 0.08);
-  --stroke: rgba(255, 255, 255, 0.10);
+  --bg0: #05070c;
+  --bg1: #0b0f18;
+  --panel: rgba(10, 14, 22, 0.72);
+  --card: rgba(12, 18, 28, 0.78);
+  --stroke: rgba(255, 255, 255, 0.09);
   --stroke2: rgba(255, 255, 255, 0.14);
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.62);
-  --muted2: rgba(255, 255, 255, 0.48);
-  --accent: #7c3aed; /* violet */
-  --accent2: #22c55e; /* green */
+  --text: rgba(231, 238, 247, 0.92);
+  --muted: rgba(231, 238, 247, 0.62);
+  --muted2: rgba(231, 238, 247, 0.45);
+  --accent: #ff7a18; /* neon orange */
+  --accent2: #3b82f6; /* cold blue */
   --danger: #ef4444;
 }
 
 html,
 body {
   height: 100%;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
   font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans",
     sans-serif;
-  background: radial-gradient(1200px 700px at 10% 10%, rgba(124, 58, 237, 0.22), transparent 60%),
-    radial-gradient(1000px 650px at 80% 15%, rgba(34, 197, 94, 0.14), transparent 55%),
-    radial-gradient(900px 600px at 55% 90%, rgba(59, 130, 246, 0.12), transparent 55%),
+  background: radial-gradient(1200px 700px at 18% 12%, rgba(59, 130, 246, 0.18), transparent 60%),
+    radial-gradient(1000px 650px at 82% 18%, rgba(148, 163, 184, 0.08), transparent 55%),
+    radial-gradient(900px 600px at 55% 92%, rgba(255, 122, 24, 0.08), transparent 55%),
     linear-gradient(180deg, var(--bg0), var(--bg1));
   color: var(--text);
+  overflow-x: clip;
 }
 
 * {
@@ -55,7 +58,7 @@ body {
   }
 
   .ring-soft {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 60px rgba(0, 0, 0, 0.42);
   }
 }
 
@@ -64,7 +67,7 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(34, 197, 94, 0.85));
+    background: linear-gradient(180deg, rgba(255, 122, 24, 0.95), rgba(255, 122, 24, 0.72));
     color: black;
   }
   .btn-primary:hover {

@@ -8,13 +8,14 @@ type UpgradeMode =
   | { kind: "mult"; value: 2 | 5 | 10 }
   | { kind: "chance"; value: 75 | 50 | 30 };
 
-type Body = { betItemId?: string; mode?: UpgradeMode };
+type Body = { betItemId?: string; targetItemId?: string | null; mode?: UpgradeMode };
 
 export async function POST(req: NextRequest) {
   const { state } = await requireState(req);
   const body = (await req.json().catch(() => null)) as Body | null;
 
   const betItemId = body?.betItemId;
+  const targetItemId = body?.targetItemId ?? null;
   const mode = body?.mode;
   if (!betItemId) return NextResponse.json({ success: false, error: "betItemId required" }, { status: 400 });
   if (!mode) return NextResponse.json({ success: false, error: "mode required" }, { status: 400 });
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
   const betItem = getItem(betItemId);
   if (!betItem) return NextResponse.json({ success: false, error: "Unknown bet item" }, { status: 404 });
 
-  const result = playUpgradeResult(betItemId, mode);
+  const result = playUpgradeResult(betItemId, mode, targetItemId);
   const now = Date.now();
 
   const inventoryAfterLoss = state.inventoryItemIds.filter((id) => id !== betItemId);
