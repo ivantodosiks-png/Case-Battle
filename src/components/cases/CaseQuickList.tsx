@@ -22,36 +22,27 @@ export function CaseQuickList({ lootCase }: { lootCase: LootCase }) {
   };
 
   return (
-    <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10">
+    <div className="glass ring-soft rounded-2xl p-4">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-semibold text-white">Содержимое</div>
+        <div className="text-sm font-semibold text-white">Быстрый список</div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => scrollTo("top")}
-            className="rounded-xl bg-black/20 px-2 py-1 text-xs text-white/70 ring-1 ring-white/10 hover:text-white"
-          >
+          <button onClick={() => scrollTo("top")} className="btn btn-ghost px-2 py-1 text-xs">
             Вверх
           </button>
-          <button
-            onClick={() => scrollTo("bottom")}
-            className="rounded-xl bg-black/20 px-2 py-1 text-xs text-white/70 ring-1 ring-white/10 hover:text-white"
-          >
+          <button onClick={() => scrollTo("bottom")} className="btn btn-ghost px-2 py-1 text-xs">
             Вниз
           </button>
         </div>
       </div>
 
-      <div
-        ref={wrapRef}
-        className="max-h-[520px] space-y-2 overflow-y-auto pr-1 [scrollbar-gutter:stable] overscroll-contain"
-      >
+      <div ref={wrapRef} className="max-h-[560px] space-y-2 overflow-y-auto pr-1 [scrollbar-gutter:stable] overscroll-contain">
         {items.map((it) => {
           const color = rarityColor[it.rarity];
           return (
             <div
               key={it.id}
-              className="flex items-center gap-3 rounded-2xl bg-card/55 p-2 ring-1 ring-white/10"
-              style={{ boxShadow: `0 0 18px ${color}18` }}
+              className="glass-card flex items-center gap-3 rounded-2xl p-2 transition hover:border-white/20"
+              style={{ boxShadow: `0 0 20px ${color}12` }}
             >
               <div
                 className="h-12 w-16 flex-none rounded-xl ring-1 ring-white/10"

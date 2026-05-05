@@ -27,7 +27,7 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
 
   const reel = useMemo(() => {
     const pool = lootCase.itemIds.map((id) => getItem(id)).filter(Boolean) as Item[];
-    const long = Array.from({ length: 40 }, (_, i) => pool[i % pool.length]!).slice(0, 40);
+    const long = Array.from({ length: 44 }, (_, i) => pool[i % pool.length]!).slice(0, 44);
     return long;
   }, [lootCase.itemIds]);
 
@@ -45,6 +45,7 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
       balance: number;
       spinData: SpinData;
     };
+
     let res: OpenRes;
     try {
       res = await apiPost<OpenRes>("/api/cases/open", token, { caseId: lootCase.id });
@@ -59,14 +60,13 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
     setWonItem(item);
     applyUpdate({ token: res.token, state: res.state });
 
-    // Animation: shift track so win item "lands" around the center.
-    const winIndex = Math.max(10, reel.findIndex((x) => x.id === spinData.winItemId));
-    const cardW = 120;
+    const winIndex = Math.max(12, reel.findIndex((x) => x.id === spinData.winItemId));
+    const cardW = 128;
     const gap = 12;
-    const centerOffset = 180;
+    const centerOffset = 192;
     const target = -(winIndex * (cardW + gap) - centerOffset);
-
     setTrackX(target);
+
     setTimeout(() => setSpinning(false), 4800);
   }
 
@@ -89,38 +89,33 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
   }
 
   return (
-    <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10">
+    <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-white/70">
-          Открытие: <span className="font-semibold text-white">{lootCase.price} ₽</span>
+        <div className="flex items-center gap-2">
+          <span className="pill">Цена открытия</span>
+          <span className="pill">{lootCase.price} ₽</span>
         </div>
-        <button
-          onClick={open}
-          disabled={spinning}
-          className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-black transition hover:brightness-110 disabled:opacity-60"
-        >
-          {spinning ? "Крутим…" : `Открыть за ${lootCase.price} ₽`}
+        <button onClick={open} disabled={spinning} className="btn btn-primary">
+          {spinning ? "Открываем…" : `Открыть за ${lootCase.price} ₽`}
         </button>
       </div>
 
-      <div className="relative mt-4 overflow-hidden rounded-2xl bg-card/40 ring-1 ring-white/10">
-        <div className="pointer-events-none absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 bg-accent shadow-[0_0_24px_rgba(255,106,26,0.55)]" />
+      <div className="relative overflow-hidden rounded-2xl bg-white/5 ring-1 ring-white/10">
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 bg-white shadow-[0_0_22px_rgba(255,255,255,0.35)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/20 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/25 to-transparent" />
 
-        <motion.div
-          className="flex gap-3 p-4"
-          animate={{ x: trackX }}
-          transition={{ duration: 4.6, ease: [0.15, 0.85, 0.15, 1] }}
-        >
+        <motion.div className="flex gap-3 p-4" animate={{ x: trackX }} transition={{ duration: 4.6, ease: [0.15, 0.85, 0.15, 1] }}>
           {reel.map((it, idx) => {
             const color = rarityColor[it.rarity];
             return (
               <div
                 key={`${it.id}_${idx}`}
-                className="w-[120px] flex-none rounded-2xl bg-[#0b1020]/40 p-2 ring-1 ring-white/10"
-                style={{ boxShadow: `0 0 18px ${color}22` }}
+                className="w-[128px] flex-none overflow-hidden rounded-2xl bg-black/25 p-2 ring-1 ring-white/10"
+                style={{ boxShadow: `0 0 26px ${color}18` }}
               >
                 <div
-                  className="h-16 rounded-xl"
+                  className="h-16 rounded-xl ring-1 ring-white/10"
                   style={{ background: `linear-gradient(135deg, ${it.image.from}, ${it.image.to})`, border: `1px solid ${color}55` }}
                 />
                 <div className="mt-2 truncate text-[11px] font-semibold text-white">{it.name}</div>
@@ -135,26 +130,25 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
       </div>
 
       {wonItem ? (
-        <div className="mt-4 rounded-2xl bg-card/55 p-3 text-sm ring-1 ring-accent/25">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Link
-              href="/inventory"
-              className="rounded-xl bg-accent px-3 py-2 text-xs font-semibold text-black transition hover:brightness-110"
-            >
-              Оставить
-            </Link>
-            <button
-              onClick={sell}
-              disabled={busyAction === "sell"}
-              className="rounded-xl bg-black/25 px-3 py-2 text-xs font-semibold text-white/80 ring-1 ring-white/10 transition hover:text-white disabled:opacity-60"
-            >
-              {busyAction === "sell" ? "Продаём…" : `Продать за ${wonItem.price} ₽`}
-            </button>
+        <div className="glass-card ring-soft rounded-2xl p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <div className="text-xs text-white/55">Выпало</div>
+              <div className="truncate text-sm font-semibold text-white">{wonItem.name}</div>
+              <div className="mt-1 text-xs text-white/60">{wonItem.price} ₽</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/inventory" className="btn btn-primary px-3 py-2 text-xs">
+                Оставить
+              </Link>
+              <button onClick={sell} disabled={busyAction === "sell"} className="btn btn-ghost px-3 py-2 text-xs">
+                {busyAction === "sell" ? "Продаём…" : `Продать за ${wonItem.price} ₽`}
+              </button>
+            </div>
           </div>
-          Выпало: <span className="font-semibold text-white">{wonItem.name}</span>{" "}
-          <span className="text-white/60">({wonItem.price} ₽)</span>
         </div>
       ) : null}
     </div>
   );
 }
+

@@ -17,12 +17,12 @@ export function ItemCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl bg-card/55 p-3 ring-1 ring-white/10 transition",
-        selected && "ring-2 ring-accent/60",
-        onSelect && "cursor-pointer hover:bg-card/70",
+        "glass-card relative overflow-hidden rounded-2xl p-3 transition hover:border-white/20",
+        selected && "ring-2 ring-white/25",
+        onSelect && "cursor-pointer",
       )}
       onClick={onSelect}
-      style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.03), 0 0 28px ${color}22` }}
+      style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 0 34px ${color}14` }}
     >
       <div
         className="h-20 rounded-xl ring-1 ring-white/10"

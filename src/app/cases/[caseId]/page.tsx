@@ -10,19 +10,24 @@ export default function CasePage({ params }: { params: { caseId: string } }) {
 
   return (
     <div className="space-y-4 pb-10">
-      <div className="rounded-2xl bg-panel/60 p-4 ring-1 ring-white/10">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <div className="glass ring-soft rounded-2xl p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-display text-lg tracking-wide text-white">{lootCase.name}</div>
-            <div className="text-sm text-white/60">Содержимое ниже. Открытие — с серверным RNG.</div>
+            <div className="text-sm text-white/60">Открытие на сервере. Забирай предмет или продавай за баланс.</div>
           </div>
-          <div className="text-sm text-white/70">Цена: {lootCase.price} ₽</div>
+          <div className="flex items-center gap-2">
+            <span className="pill">{lootCase.itemIds.length} предметов</span>
+            <span className="pill">{lootCase.price} ₽</span>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_360px] lg:items-start">
         <div className="space-y-3">
-          <CaseOpenPanel lootCase={lootCase} />
+          <div className="glass ring-soft rounded-2xl p-4">
+            <CaseOpenPanel lootCase={lootCase} />
+          </div>
           <div className="lg:hidden">
             <CaseQuickList lootCase={lootCase} />
           </div>
@@ -35,3 +40,4 @@ export default function CasePage({ params }: { params: { caseId: string } }) {
     </div>
   );
 }
+

@@ -23,7 +23,7 @@ export function UpgradeWheel({
   const fillStyle = useMemo(() => {
     return {
       background: `conic-gradient(from 270deg, #22c55e 0deg ${winDeg}deg, rgba(255,255,255,0.08) 0deg)`,
-      boxShadow: "0 0 0 1px rgba(255,255,255,0.03), 0 0 48px rgba(255,106,26,0.12)",
+      boxShadow: "0 0 0 1px rgba(255,255,255,0.05), 0 0 56px rgba(124,58,237,0.18)",
     } as const;
   }, [winDeg]);
 
@@ -54,9 +54,9 @@ export function UpgradeWheel({
           transition={spinning ? { duration: 4.2, ease: [0.12, 0.92, 0.18, 1] } : { duration: 0.2 }}
         >
           <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2">
-            <div className="absolute -top-[112px] left-1/2 h-[112px] w-[2px] -translate-x-1/2 bg-accent/70 shadow-[0_0_24px_rgba(255,106,26,0.35)]" />
+            <div className="absolute -top-[112px] left-1/2 h-[112px] w-[2px] -translate-x-1/2 bg-accent/70 shadow-[0_0_26px_rgba(124,58,237,0.35)]" />
             <div className="absolute -top-[120px] left-1/2 -translate-x-1/2">
-              <div className="h-0 w-0 border-x-[9px] border-x-transparent border-b-[14px] border-b-accent drop-shadow-[0_0_18px_rgba(255,106,26,0.65)]" />
+              <div className="h-0 w-0 border-x-[9px] border-x-transparent border-b-[14px] border-b-accent drop-shadow-[0_0_20px_rgba(124,58,237,0.65)]" />
             </div>
           </div>
         </motion.div>

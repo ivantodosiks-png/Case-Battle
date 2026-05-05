@@ -9,16 +9,20 @@ export function CaseContents({ lootCase }: { lootCase: LootCase }) {
     .sort((a, b) => b.price - a.price);
 
   return (
-    <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10">
-      <div className="mb-3 text-sm font-semibold text-white">Содержимое</div>
+    <div className="glass ring-soft rounded-2xl p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-semibold text-white">Все предметы</div>
+        <div className="pill">{items.length} шт</div>
+      </div>
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((it) => {
           const color = rarityColor[it.rarity];
           return (
             <div
               key={it.id}
-              className="relative overflow-hidden rounded-2xl bg-card/55 p-3 ring-1 ring-white/10"
-              style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.03), 0 0 28px ${color}22` }}
+              className="glass-card relative overflow-hidden rounded-2xl p-3 transition hover:border-white/20"
+              style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 0 34px ${color}14` }}
             >
               <div
                 className="h-20 rounded-xl ring-1 ring-white/10"
@@ -36,3 +40,4 @@ export function CaseContents({ lootCase }: { lootCase: LootCase }) {
     </div>
   );
 }
+

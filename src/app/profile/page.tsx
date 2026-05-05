@@ -13,15 +13,15 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-4 pb-10">
-      <div className="rounded-2xl bg-panel/60 p-4 ring-1 ring-white/10">
+      <div className="glass ring-soft rounded-2xl p-4">
         <div className="flex items-center gap-3">
-          <div className="h-14 w-14 overflow-hidden rounded-2xl bg-card/60 ring-1 ring-white/10">
+          <div className="h-14 w-14 overflow-hidden rounded-2xl bg-white/5 ring-1 ring-white/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={avatarUrl} alt="avatar" className="h-full w-full" />
           </div>
           <div>
             <div className="font-display text-lg tracking-wide text-white">{state?.user.username ?? "demo_player"}</div>
-            <div className="text-sm text-white/60">Local demo profile (signed state)</div>
+            <div className="text-sm text-white/60">Демо-профиль (signed state)</div>
           </div>
         </div>
       </div>
@@ -35,11 +35,10 @@ export default function ProfilePage() {
         <Stat title="В инвентаре" value={`${state?.inventoryItemIds.length ?? 0}`} />
       </div>
 
-      <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10">
+      <div className="glass ring-soft rounded-2xl p-4">
         <div className="text-sm font-semibold text-white">О проекте</div>
         <div className="mt-2 text-sm text-white/60">
-          Это оригинальный UI-демо без брендов/логотипов. Состояние хранится в localStorage, но защищено подписью сервера
-          (HMAC), чтобы нельзя было подделать баланс/инвентарь через devtools.
+          Это демо без реальных скинов/брендов. Состояние хранится в localStorage, но защищено подписью сервера (HMAC).
         </div>
       </div>
     </div>
@@ -48,7 +47,7 @@ export default function ProfilePage() {
 
 function Stat({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10">
+    <div className="glass ring-soft rounded-2xl p-4">
       <div className="text-xs text-white/55">{title}</div>
       <div className="mt-1 font-display text-xl text-white">{value}</div>
     </div>

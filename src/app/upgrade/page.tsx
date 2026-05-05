@@ -54,6 +54,14 @@ export default function UpgradePage() {
   const chance = Math.max(1, Math.min(95, rawChance || 0));
   const multiplier = targetItem && betValue > 0 ? targetItem.price / betValue : 0;
 
+  const targetOptions = useMemo(() => {
+    if (betValue <= 0) return catalog.slice().sort((a, b) => a.price - b.price);
+    return catalog
+      .filter((it) => it.price > betValue)
+      .slice()
+      .sort((a, b) => a.price - b.price);
+  }, [catalog, betValue]);
+
   const pickTargetNear = (desiredValue: number) => {
     if (!catalog.length) return null;
     const desired = Math.max(desiredValue, betValue + 1);
@@ -72,14 +80,6 @@ export default function UpgradePage() {
     const pick = pickTargetNear(desiredTarget);
     if (pick) setTarget(pick.id);
   };
-
-  const targetOptions = useMemo(() => {
-    if (betValue <= 0) return catalog.slice().sort((a, b) => a.price - b.price);
-    return catalog
-      .filter((it) => it.price > betValue)
-      .slice()
-      .sort((a, b) => a.price - b.price);
-  }, [catalog, betValue]);
 
   async function play() {
     if (spinning) return;
@@ -101,6 +101,7 @@ export default function UpgradePage() {
       token: string;
       state: SignedState;
     };
+
     let res: UpgradeRes;
     try {
       res = await apiPost<UpgradeRes>("/api/upgrader/play", token, {
@@ -121,13 +122,12 @@ export default function UpgradePage() {
       return res.won ? [res.targetItem, ...kept] : kept;
     });
 
-    // Let animation run; then show result.
     setTimeout(() => {
       const won = Boolean(res.won);
       setResultText(
         won
           ? `Победа! Ты получил ${res.targetItem.name} (${res.targetItem.price} ₽)`
-          : `Проигрыш. Кешбек ${res.cashback.percent}% = ${res.cashback.amount} ₽`,
+          : `Проигрыш. Кэшбек ${res.cashback.percent}% = ${res.cashback.amount} ₽`,
       );
       setSpinning(false);
       clearSelected();
@@ -136,38 +136,44 @@ export default function UpgradePage() {
 
   return (
     <div className="space-y-4 pb-10">
-      <div className="rounded-2xl bg-panel/60 p-4 ring-1 ring-white/10">
-        <div className="flex flex-col gap-1">
-          <div className="font-display text-lg tracking-wide text-white">Апгрейд</div>
-          <div className="text-sm text-white/60">
-            Chance = (ставка / цель) × 100, минимум 1%, максимум 95%. Результат считается на backend.
+      <div className="glass ring-soft rounded-2xl p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="font-display text-lg tracking-wide text-white">Апгрейд</div>
+            <div className="text-sm text-white/60">Выбирай ставку, затем цель — шанс считается на сервере.</div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="pill">Ставка: {betValue} ₽</span>
+            <span className="pill">Цель: {targetItem?.price ?? 0} ₽</span>
+            <span className="pill">x{multiplier ? multiplier.toFixed(2) : "—"}</span>
+            <span className="pill">{targetItem ? `${chance.toFixed(1)}%` : "—"}</span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10 lg:col-span-1">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_420px_1fr]">
+        <div className="glass ring-soft rounded-2xl p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="text-sm font-semibold text-white">Ставка (до 6)</div>
-            <button
-              onClick={() => clearSelected()}
-              className="rounded-xl bg-black/20 px-2 py-1 text-xs text-white/70 ring-1 ring-white/10"
-            >
+            <button onClick={() => clearSelected()} className="btn btn-ghost px-3 py-1.5 text-xs">
               Очистить
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {inventory.slice(0, 18).map((it) => (
-              <ItemCard key={it.id} item={it} selected={selected.includes(it.id)} onSelect={() => toggle(it.id)} />
-            ))}
+          <div className="max-h-[720px] overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+            <div className="grid grid-cols-2 gap-3">
+              {inventory.map((it) => (
+                <ItemCard key={it.id} item={it} selected={selected.includes(it.id)} onSelect={() => toggle(it.id)} />
+              ))}
+            </div>
           </div>
+          {inventory.length === 0 ? <div className="mt-3 text-xs text-white/55">Инвентарь пуст — открой кейс.</div> : null}
         </div>
 
-        <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10 lg:col-span-1">
-          <div className="mb-4 grid gap-3">
+        <div className="glass ring-soft rounded-2xl p-4">
+          <div className="grid gap-3">
             <UpgradeWheel chance={chance || 1} spinning={spinning} stopRoll={stopRoll} />
 
-            <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
+            <div className="glass-card rounded-2xl p-3">
               <div className="text-xs text-white/55">Быстрый выбор</div>
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {[2, 5, 10].map((x) => (
@@ -177,9 +183,7 @@ export default function UpgradePage() {
                     disabled={spinning || betValue <= 0}
                     className={[
                       "rounded-xl px-3 py-2 text-xs font-semibold ring-1 transition disabled:opacity-60",
-                      preset?.kind === "mult" && preset.value === x
-                        ? "bg-accent text-black ring-accent/40"
-                        : "bg-black/20 text-white/80 ring-white/10 hover:text-white",
+                      preset?.kind === "mult" && preset.value === x ? "bg-white text-black ring-white/30" : "bg-black/20 text-white/80 ring-white/10 hover:text-white",
                     ].join(" ")}
                   >
                     x{x}
@@ -194,56 +198,32 @@ export default function UpgradePage() {
                     disabled={spinning || betValue <= 0}
                     className={[
                       "rounded-xl px-3 py-2 text-xs font-semibold ring-1 transition disabled:opacity-60",
-                      preset?.kind === "chance" && preset.value === p
-                        ? "bg-accent text-black ring-accent/40"
-                        : "bg-black/20 text-white/80 ring-white/10 hover:text-white",
+                      preset?.kind === "chance" && preset.value === p ? "bg-white text-black ring-white/30" : "bg-black/20 text-white/80 ring-white/10 hover:text-white",
                     ].join(" ")}
                   >
                     {p}%
                   </button>
                 ))}
               </div>
-              <div className="mt-2 text-[11px] text-white/55">Нажми x/%, чтобы автоматически выбрать цель справа.</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
-                <div className="text-xs text-white/55">Ставка</div>
-                <div className="text-sm font-semibold text-white">{betValue} ₽</div>
-              </div>
-              <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
-                <div className="text-xs text-white/55">Цель</div>
-                <div className="text-sm font-semibold text-white">{targetItem?.price ?? 0} ₽</div>
-              </div>
-              <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
-                <div className="text-xs text-white/55">Множитель</div>
-                <div className="text-sm font-semibold text-white">{multiplier ? `x${multiplier.toFixed(2)}` : "—"}</div>
-              </div>
-              <div className="rounded-2xl bg-card/45 p-3 ring-1 ring-white/10">
-                <div className="text-xs text-white/55">Шанс</div>
-                <div className="text-sm font-semibold text-white">{targetItem ? `${chance.toFixed(1)}%` : "—"}</div>
-              </div>
+              <div className="mt-2 text-[11px] text-white/55">Нажми x/% — цель подберётся автоматически.</div>
             </div>
 
-            <button
-              onClick={play}
-              disabled={spinning}
-              className="rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-black transition hover:brightness-110 disabled:opacity-60"
-            >
+            <button onClick={play} disabled={spinning} className="btn btn-primary py-3">
               {spinning ? "Крутим…" : "Апгрейд"}
             </button>
 
-            {resultText ? (
-              <div className="rounded-2xl bg-card/55 p-3 text-sm ring-1 ring-white/10">{resultText}</div>
-            ) : null}
+            {resultText ? <div className="glass-card rounded-2xl p-3 text-sm ring-1 ring-white/10">{resultText}</div> : null}
           </div>
         </div>
 
-        <div className="rounded-2xl bg-panel/50 p-4 ring-1 ring-white/10 lg:col-span-1">
+        <div className="glass ring-soft rounded-2xl p-4">
           <div className="mb-3 text-sm font-semibold text-white">Цель</div>
-          <div className="grid grid-cols-2 gap-3">
-            {targetOptions.slice(0, 18).map((it) => (
-              <ItemCard key={it.id} item={it} selected={it.id === targetId} onSelect={() => setTarget(it.id)} />
-            ))}
+          <div className="max-h-[720px] overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+            <div className="grid grid-cols-2 gap-3">
+              {targetOptions.map((it) => (
+                <ItemCard key={it.id} item={it} selected={it.id === targetId} onSelect={() => setTarget(it.id)} />
+              ))}
+            </div>
           </div>
           {betValue > 0 ? <div className="mt-3 text-xs text-white/55">Показываю только цели дороже ставки.</div> : null}
         </div>
@@ -251,3 +231,4 @@ export default function UpgradePage() {
     </div>
   );
 }
+
