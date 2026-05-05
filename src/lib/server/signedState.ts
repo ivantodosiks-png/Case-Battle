@@ -70,6 +70,7 @@ export function makeInitialState(): SignedState {
     balance: 1000,
     inventoryItemIds: inventory,
     upgradeLockUntil: 0,
+    caseLockUntil: 0,
     history: [],
     liveDrops: [],
     stats: {

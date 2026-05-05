@@ -52,6 +52,7 @@ export type SignedState = {
   balance: number;
   inventoryItemIds: string[]; // owned items only
   upgradeLockUntil?: number; // epoch ms, soft client lock
+  caseLockUntil?: number; // epoch ms, soft client lock
   history: HistoryEntry[];
   liveDrops: LiveDropEntry[];
   stats: {

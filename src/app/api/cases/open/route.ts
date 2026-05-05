@@ -10,6 +10,11 @@ export async function POST(req: NextRequest) {
   const caseId = body?.caseId;
   if (!caseId) return NextResponse.json({ success: false, error: "caseId required" }, { status: 400 });
 
+  const now = Date.now();
+  if (state.caseLockUntil && now < state.caseLockUntil) {
+    return NextResponse.json({ success: false, error: "Case opening in progress" }, { status: 429 });
+  }
+
   const lootCase = getCase(caseId);
   if (!lootCase) return NextResponse.json({ success: false, error: "Unknown case" }, { status: 404 });
 
@@ -20,10 +25,10 @@ export async function POST(req: NextRequest) {
   const { item, spinData } = openCaseResult(caseId);
 
   const newBalance = state.balance - lootCase.price;
-  const now = Date.now();
 
   const updated = {
     ...state,
+    caseLockUntil: now + 5000,
     balance: newBalance,
     inventoryItemIds: [item.id, ...state.inventoryItemIds],
     history: [

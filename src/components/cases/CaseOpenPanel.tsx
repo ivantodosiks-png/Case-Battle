@@ -21,19 +21,20 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
   const applyUpdate = useSessionStore((s) => s.applyUpdate);
 
   const [spinning, setSpinning] = useState(false);
+  const [openMode, setOpenMode] = useState<"normal" | "quick">("normal");
   const [wonItem, setWonItem] = useState<Item | null>(null);
   const [trackX, setTrackX] = useState(0);
   const [busyAction, setBusyAction] = useState<"sell" | null>(null);
 
   const reel = useMemo(() => {
     const pool = lootCase.itemIds.map((id) => getItem(id)).filter(Boolean) as Item[];
-    const long = Array.from({ length: 44 }, (_, i) => pool[i % pool.length]!).slice(0, 44);
-    return long;
+    return Array.from({ length: 44 }, (_, i) => pool[i % pool.length]!).slice(0, 44);
   }, [lootCase.itemIds]);
 
-  async function open() {
+  async function open(mode: "normal" | "quick") {
     if (spinning) return;
     setSpinning(true);
+    setOpenMode(mode);
     setWonItem(null);
     setBusyAction(null);
 
@@ -67,7 +68,7 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
     const target = -(winIndex * (cardW + gap) - centerOffset);
     setTrackX(target);
 
-    setTimeout(() => setSpinning(false), 4800);
+    setTimeout(() => setSpinning(false), mode === "quick" ? 1600 : 4800);
   }
 
   async function sell() {
@@ -95,9 +96,14 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
           <span className="pill">Цена открытия</span>
           <span className="pill">{lootCase.price} ₽</span>
         </div>
-        <button onClick={open} disabled={spinning} className="btn btn-primary">
-          {spinning ? "Открываем…" : `Открыть за ${lootCase.price} ₽`}
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <button onClick={() => open("normal")} disabled={spinning} className="btn btn-primary">
+            {spinning && openMode === "normal" ? "Открываем…" : "Открыть обычно"}
+          </button>
+          <button onClick={() => open("quick")} disabled={spinning} className="btn btn-ghost">
+            {spinning && openMode === "quick" ? "Быстро…" : "Открыть быстро"}
+          </button>
+        </div>
       </div>
 
       <div className="relative overflow-hidden rounded-2xl bg-white/5 ring-1 ring-white/10">
@@ -105,7 +111,12 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/20 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/25 to-transparent" />
 
-        <motion.div className="flex gap-3 p-4" animate={{ x: trackX }} transition={{ duration: 4.6, ease: [0.15, 0.85, 0.15, 1] }}>
+        <motion.div
+          className="flex gap-3 p-4"
+          style={{ willChange: "transform" }}
+          animate={{ x: trackX }}
+          transition={{ duration: openMode === "quick" ? 1.5 : 4.6, ease: [0.15, 0.85, 0.15, 1] }}
+        >
           {reel.map((it, idx) => {
             const color = rarityColor[it.rarity];
             return (
@@ -116,7 +127,10 @@ export function CaseOpenPanel({ lootCase }: { lootCase: LootCase }) {
               >
                 <div
                   className="h-16 rounded-xl ring-1 ring-white/10"
-                  style={{ background: `linear-gradient(135deg, ${it.image.from}, ${it.image.to})`, border: `1px solid ${color}55` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${it.image.from}, ${it.image.to})`,
+                    border: `1px solid ${color}55`,
+                  }}
                 />
                 <div className="mt-2 truncate text-[11px] font-semibold text-white">{it.name}</div>
                 <div className="mt-1 flex items-center justify-between text-[10px] text-white/60">
