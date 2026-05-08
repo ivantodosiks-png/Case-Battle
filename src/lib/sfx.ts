@@ -71,9 +71,18 @@ export async function sfxPrime() {
 }
 
 export function sfxSpinTick(intensity = 1) {
-  // roulette-like click: short noise + tiny pitch blip
-  noiseBurst(18, 0.06 + 0.06 * intensity, 0, 1400 + 600 * intensity);
-  tone(140 + 90 * intensity, 22, "triangle", 0.03 + 0.03 * intensity, 0.0);
+  // roulette-like click: short noise + tiny pitch blip (slightly randomized)
+  const i = Math.max(0, Math.min(1, intensity));
+  const r = Math.random();
+  const dur = 14 + Math.floor(12 * r); // 14..26ms
+  const hp = 1200 + 1200 * i + 700 * Math.random();
+  const g = 0.04 + 0.09 * i;
+
+  noiseBurst(dur, g, 0, hp);
+
+  const base = 120 + 140 * i;
+  const freq = base + 40 * (Math.random() - 0.5);
+  tone(freq, 16 + 16 * r, r < 0.35 ? "square" : "triangle", 0.02 + 0.05 * i, 0.0);
 }
 
 export function sfxWin() {

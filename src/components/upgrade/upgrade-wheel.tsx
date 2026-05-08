@@ -66,10 +66,14 @@ export function UpgradeWheel() {
 
     setPhase("spinning");
 
-    // Slow, heavy spin (visual only)
-    const baseTurns = 7 + Math.floor(Math.random() * 6); // 7..12
+    // Visual-only spin profile: chance/result stays real, but the animation pacing is randomized.
     const profile = Math.random();
-    const durationMs = profile < 0.2 ? 7800 : profile < 0.7 ? 9500 : 11500;
+    const isFast = profile < 0.45;
+    const baseTurns = isFast ? 5 + Math.floor(Math.random() * 5) : 8 + Math.floor(Math.random() * 7); // 5..9 or 8..14
+    const durationMs = isFast
+      ? 3600 + Math.floor(Math.random() * 2200) // 3.6..5.8s
+      : 8200 + Math.floor(Math.random() * 5200); // 8.2..13.4s
+    const easePower = isFast ? 2.6 + Math.random() * 1.2 : 3.4 + Math.random() * 1.4;
 
     const resChance = clamp(res.chancePct / 100, 0, 1);
     const winSpan = 360 * resChance;
@@ -82,17 +86,26 @@ export function UpgradeWheel() {
     const target = rotation.get() + baseTurns * 360 + finalAngle;
 
     const t0 = performance.now();
-    let lastTick = 0;
     const startAngle = rotation.get();
+    let lastAngle = startAngle;
+    let lastTickAngle = startAngle;
+    let nextTickStep = 10 + Math.random() * 10; // degrees between ticks
     const tick = (t: number) => {
       if (abort.signal.aborted) return;
       const p = clamp((t - t0) / durationMs, 0, 1);
-      const easeOut = 1 - Math.pow(1 - p, 3.6);
-      rotation.set(startAngle + (target - startAngle) * easeOut);
+      const easeOut = 1 - Math.pow(1 - p, easePower);
+      const angle = startAngle + (target - startAngle) * easeOut;
+      rotation.set(angle);
 
-      if (t - lastTick > 95) {
-        sfxSpinTick(0.3 + 0.7 * p);
-        lastTick = t;
+      const delta = Math.abs(angle - lastAngle);
+      lastAngle = angle;
+
+      // Tick sound follows speed (more frequent when faster, rarer when slower).
+      if (Math.abs(angle - lastTickAngle) >= nextTickStep) {
+        const speed = clamp(delta / 9, 0, 1); // heuristic for frame-to-frame speed
+        sfxSpinTick(0.15 + 0.85 * speed);
+        lastTickAngle = angle;
+        nextTickStep = 10 + Math.random() * 10;
       }
 
       if (p < 1) requestAnimationFrame(tick);
