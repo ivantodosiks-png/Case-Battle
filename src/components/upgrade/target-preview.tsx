@@ -34,7 +34,7 @@ export function TargetPreview() {
             style={{ background: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06), transparent 55%)" }}
           />
           {skin?.image ? (
-            <Image src={skin.image} alt={skin.name} fill className="object-contain p-4 opacity-95" />
+            <Image src={skin.image} alt={skin.name} fill className="object-contain p-2 opacity-100 saturate-110 contrast-110 drop-shadow-[0_14px_28px_rgba(0,0,0,0.55)]" />
           ) : (
             <div className="absolute inset-0 grid place-items-center">
               <div className="text-sm text-white/45">Скин не выбран</div>

@@ -5,9 +5,23 @@ import { Card } from "@/components/ui/card";
 import { Counter } from "@/components/ui/counter";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
 import { fmtMoney } from "@/lib/money";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 export function Topbar() {
   const balance = useUpgradeStore((s) => s.balance);
+  const lastBonusAt = useUpgradeStore((s) => s.lastBonusAt);
+  const grantBonus = useUpgradeStore((s) => s.grantBonus);
+  const [nowTs, setNowTs] = useState(() => Date.now());
+
+  useEffect(() => {
+    const t = window.setInterval(() => setNowTs(Date.now()), 400);
+    return () => window.clearInterval(t);
+  }, []);
+
+  const cdMs = 60_000;
+  const remaining = Math.max(0, cdMs - (nowTs - (lastBonusAt || 0)));
+  const canBonus = remaining === 0;
 
   return (
     <div className="px-3 pt-4 sm:px-6">
@@ -20,7 +34,19 @@ export function Topbar() {
           </div>
         </div>
 
-        <Card className="flex items-center gap-3 px-4 py-2">
+        <div className="flex items-center gap-3">
+          <Button
+            size="sm"
+            variant={canBonus ? "primary" : "secondary"}
+            disabled={!canBonus}
+            onClick={() => {
+              grantBonus();
+            }}
+          >
+            +500{canBonus ? "" : ` (${Math.ceil(remaining / 1000)}s)`}
+          </Button>
+
+          <Card className="flex items-center gap-3 px-4 py-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/6 ring-soft text-white/80">
             <Wallet className="h-4 w-4" />
           </div>
@@ -30,9 +56,9 @@ export function Topbar() {
               <Counter value={balance} format={fmtMoney} /> ₽
             </div>
           </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   );
 }
-

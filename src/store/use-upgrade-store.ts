@@ -156,7 +156,7 @@ export const useUpgradeStore = create<UpgradeState>()(
       grantBonus: () => {
         const s = get();
         const nowTs = now();
-        const cdMs = 30_000;
+        const cdMs = 60_000;
         if (s.lastBonusAt && nowTs - s.lastBonusAt < cdMs) return false;
         set((st) => ({
           balance: Math.round((st.balance + 500) * 100) / 100,
