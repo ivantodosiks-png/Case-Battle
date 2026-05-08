@@ -6,7 +6,6 @@ import { Topbar } from "@/components/upgrade/topbar";
 import { InventoryPanel } from "@/components/upgrade/inventory-panel";
 import { UpgradeWheel } from "@/components/upgrade/upgrade-wheel";
 import { UpgradeControls } from "@/components/upgrade/upgrade-controls";
-import { RecentFeed } from "@/components/upgrade/recent-feed";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
 
 export function UpgradeScreen() {
@@ -32,9 +31,6 @@ export function UpgradeScreen() {
           </div>
           <div className="order-1 lg:order-2">
             <UpgradeWheel />
-            <div className="mt-4">
-              <RecentFeed />
-            </div>
           </div>
           <div className="order-3">
             <UpgradeControls />
@@ -44,4 +40,3 @@ export function UpgradeScreen() {
     </div>
   );
 }
-

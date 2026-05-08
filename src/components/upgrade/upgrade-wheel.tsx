@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Counter } from "@/components/ui/counter";
 import { fmtMoney } from "@/lib/money";
 import { SKIN_BY_ID } from "@/lib/skins";
 import { sfxCashback, sfxLose, sfxPrime, sfxSpinTick, sfxWin } from "@/lib/sfx";
@@ -14,6 +13,20 @@ import { useUpgradeStore } from "@/store/use-upgrade-store";
 
 function clamp(n: number, a: number, b: number) {
   return Math.min(b, Math.max(a, n));
+}
+
+function normDeg(d: number) {
+  const x = d % 360;
+  return x < 0 ? x + 360 : x;
+}
+
+function inSector(angleDeg: number, startDeg: number, spanDeg: number) {
+  const a = normDeg(angleDeg);
+  const s = normDeg(startDeg);
+  const e = normDeg(startDeg + spanDeg);
+  if (spanDeg >= 360) return true;
+  if (s <= e) return a >= s && a <= e;
+  return a >= s || a <= e; // wraps around 0
 }
 
 export function UpgradeWheel() {
@@ -68,11 +81,16 @@ export function UpgradeWheel() {
     const win = res.win;
     const winSpan = 360 * chance;
     const loseSpan = 360 - winSpan;
-    const sectorStart = 180 - winSpan / 2; // centered at bottom
+    const winStart = 180 - winSpan / 2; // centered at bottom (CSS rotate: 0=top, 180=bottom)
 
-    const localT = win ? (res.roll / chance) : ((res.roll - chance) / (1 - chance));
+    const localT = win ? res.roll / chance : (res.roll - chance) / (1 - chance);
     const offsetWithin = (win ? winSpan : loseSpan) * clamp(localT, 0, 1);
-    const finalAngle = (win ? sectorStart + offsetWithin : sectorStart + winSpan + offsetWithin) % 360;
+    // IMPORTANT: do NOT modulo the losing angles — it can wrap into the win sector visually.
+    let finalAngle = win ? winStart + offsetWithin : winStart + winSpan + offsetWithin;
+    // Safety: ensure visual sector always matches the precomputed win/lose.
+    const landsInWin = inSector(finalAngle, winStart, winSpan);
+    if (win && !landsInWin) finalAngle = winStart + winSpan * 0.5;
+    if (!win && landsInWin) finalAngle = winStart + winSpan + loseSpan * 0.5;
 
     const target = rotation.get() + (baseTurns + extraTurns) * 360 + finalAngle;
 
@@ -119,27 +137,31 @@ export function UpgradeWheel() {
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
         <CardTitle>Upgrade</CardTitle>
-        <div className="text-xs text-white/55">
-          Chance: <span className="text-white/85 font-semibold">{Math.round(chance * 100)}%</span>
-        </div>
+        <div className="text-xs text-white/60">{Math.round(chance * 100)}%</div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_220px] md:items-center">
-          <div className="relative mx-auto w-full max-w-[440px]">
+          <div className="relative mx-auto w-full max-w-[560px]">
             <div className="relative aspect-square w-full">
               <div className="absolute inset-0 rounded-[999px] bg-gradient-to-b from-white/10 to-white/5 ring-soft shadow-[0_0_80px_rgba(139,92,246,0.12)]" />
 
               <LiquidDial chance={chance} />
 
               {/* Pointer */}
-              <motion.div
-                className="absolute inset-0 grid place-items-center"
-                style={{ rotate: smoothRotation }}
-              >
-                <div className="absolute top-4 h-8 w-8 rounded-2xl bg-white/10 ring-soft backdrop-blur-xl" />
-                <div className="absolute top-2 h-10 w-10 rounded-2xl bg-gradient-to-b from-violet-400/35 to-violet-700/25 blur-md" />
-                <div className="absolute top-3 h-12 w-12 -translate-y-1 rounded-3xl bg-white/6 ring-soft" />
-                <div className="absolute top-4 h-4 w-4 rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.25)]" />
+              <motion.div className="absolute inset-0" style={{ rotate: smoothRotation }}>
+                {/* Pointer: thin neon triangle (no square) */}
+                <div className="absolute left-1/2 top-1 -translate-x-1/2">
+                  <div
+                    className="h-0 w-0"
+                    style={{
+                      borderLeft: "10px solid transparent",
+                      borderRight: "10px solid transparent",
+                      borderBottom: "18px solid rgba(255,255,255,0.85)",
+                      filter: "drop-shadow(0 0 14px rgba(139,92,246,0.45))",
+                    }}
+                  />
+                  <div className="mx-auto -mt-2 h-3 w-3 rounded-full bg-white shadow-[0_0_22px_rgba(255,255,255,0.25)]" />
+                </div>
               </motion.div>
 
               {/* Center */}
@@ -148,18 +170,12 @@ export function UpgradeWheel() {
                   <div className="text-[11px] uppercase tracking-[0.25em] text-white/55">
                     {centerStatus}
                   </div>
-                  <div className="mt-1 text-2xl font-semibold text-white/92">
+                  <div className="mt-1 text-3xl font-semibold text-white/92">
                     x{Number(multiplier).toFixed(multiplier === 2 || multiplier === 5 || multiplier === 10 ? 0 : 2)}
                   </div>
-                  <div className="mt-2 text-xs text-white/60">
-                    Stake{" "}
-                    <span className="text-white/88 font-semibold">
-                      $<Counter value={stakeValue} format={fmtMoney} />
-                    </span>{" "}
-                    → Payout{" "}
-                    <span className="text-white/88 font-semibold">
-                      $<Counter value={payoutValue} format={fmtMoney} />
-                    </span>
+                  <div className="mt-2 text-xs text-white/55">
+                    Stake <span className="text-white/88 font-semibold">${fmtMoney(stakeValue)}</span> • Payout{" "}
+                    <span className="text-white/88 font-semibold">${fmtMoney(payoutValue)}</span>
                   </div>
 
                   <AnimatePresence initial={false}>
@@ -180,8 +196,6 @@ export function UpgradeWheel() {
                             <X className="h-3.5 w-3.5" /> LOSE
                           </span>
                         )}
-                        <span className="text-white/45">seed</span>
-                        <span className="font-mono text-[11px] text-white/70">{lastResult.seed}</span>
                       </motion.div>
                     ) : null}
                   </AnimatePresence>
@@ -193,29 +207,21 @@ export function UpgradeWheel() {
           </div>
 
           <div className="space-y-3">
-            <div className="rounded-2xl bg-white/5 p-3 ring-soft">
-              <div className="text-xs uppercase tracking-wider text-white/50">Potential</div>
-              <div className="mt-1 text-2xl font-semibold text-white/92">${fmtMoney(payoutValue)}</div>
-              <div className="mt-1 text-xs text-white/55">
-                {lastResult?.win
-                  ? lastResult.rewardSkinId
-                    ? "Reward: skin"
-                    : "Reward: balance"
-                  : "Lose → animated cashback 1–5%"}
-              </div>
-            </div>
-
             <Button
               size="lg"
               className="w-full"
               onClick={spin}
               disabled={!bet || spinning || phase !== "idle"}
             >
-              {spinning || phase !== "idle" ? "Spinning..." : "Spin Upgrade"}
+              {spinning || phase !== "idle" ? "Spinning..." : "UPGRADE"}
             </Button>
-
-            <div className="text-xs text-white/50">
-              RNG is computed server-side with Web Crypto. Animation varies but doesn’t affect chances.
+            <div className="rounded-2xl bg-white/5 p-3 text-xs text-white/60 ring-soft">
+              Potential: <span className="font-semibold text-white/85">${fmtMoney(payoutValue)}</span>
+              {lastResult?.win
+                ? lastResult.rewardSkinId
+                  ? " • Reward: skin"
+                  : " • Reward: balance"
+                : " • Lose → cashback 1–5%"}
             </div>
           </div>
         </div>

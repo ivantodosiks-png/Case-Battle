@@ -24,9 +24,9 @@ export function InventoryPanel() {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
-        <CardTitle>Inventory</CardTitle>
-        <Button size="sm" variant="secondary" onClick={() => addTestSkins(6)}>
-          <Plus className="h-4 w-4" /> Add test skins
+        <CardTitle>Your items</CardTitle>
+        <Button size="sm" variant="secondary" onClick={() => addTestSkins(6)} title="Add test skins">
+          <Plus className="h-4 w-4" />
         </Button>
       </CardHeader>
       <CardContent>
@@ -38,23 +38,6 @@ export function InventoryPanel() {
           <div className="text-sm font-semibold text-white/92">
             $<Counter value={balance} format={fmtMoney} />
           </div>
-        </div>
-
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Button
-            variant={bet?.type === "skin" ? "primary" : "secondary"}
-            onClick={() => {
-              if (inventory[0]?.instanceId) selectBetSkin(inventory[0].instanceId);
-            }}
-          >
-            Bet Skin
-          </Button>
-          <Button
-            variant={bet?.type === "balance" ? "primary" : "secondary"}
-            onClick={() => setBetBalance(betAmount)}
-          >
-            Bet Balance
-          </Button>
         </div>
 
         {bet?.type === "balance" ? (
@@ -71,10 +54,14 @@ export function InventoryPanel() {
               placeholder="25"
             />
           </div>
-        ) : null}
+        ) : (
+          <div className="mt-3 rounded-2xl bg-white/4 p-3 text-xs text-white/60 ring-soft">
+            Click an item below to set it as your stake, or switch to balance bet from the right panel.
+          </div>
+        )}
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-xs uppercase tracking-wider text-white/50">Your items</div>
+          <div className="text-xs uppercase tracking-wider text-white/50">Select stake</div>
           <div className="text-xs text-white/50">{inventory.length}/36</div>
         </div>
 
@@ -108,4 +95,3 @@ export function InventoryPanel() {
     </Card>
   );
 }
-

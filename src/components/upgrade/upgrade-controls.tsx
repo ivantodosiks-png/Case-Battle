@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Dice5, Percent, Sparkles } from "lucide-react";
+import { Percent, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,7 @@ export function UpgradeControls() {
   const multiplier = useUpgradeStore((s) => s.multiplier);
   const setMultiplier = useUpgradeStore((s) => s.setMultiplier);
   const clearBet = useUpgradeStore((s) => s.clearBet);
-  const inventory = useUpgradeStore((s) => s.inventory);
-  const balance = useUpgradeStore((s) => s.balance);
+  const setBetBalance = useUpgradeStore((s) => s.setBetBalance);
 
   const chance = useMemo(() => clamp(1 / Number(multiplier || 2), 0.05, 0.95), [multiplier]);
 
@@ -44,12 +43,64 @@ export function UpgradeControls() {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
-        <CardTitle>Controls</CardTitle>
+        <CardTitle>Upgrade</CardTitle>
         <Button size="sm" variant="ghost" onClick={clearBet} disabled={!bet}>
           Clear bet
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="rounded-2xl bg-white/5 p-3 ring-soft">
+          <div className="flex items-center justify-between">
+            <div className="text-xs uppercase tracking-wider text-white/50">Stake</div>
+            <div className="text-xs text-white/60">
+              ${fmtMoney(stakeValue)} → ${fmtMoney(payoutValue)}
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Button
+              variant={bet?.type === "skin" ? "primary" : "secondary"}
+              onClick={() => toast.message("Select an item", { description: "Pick a skin from the left panel." })}
+            >
+              Skin
+            </Button>
+            <Button
+              variant={bet?.type === "balance" ? "primary" : "secondary"}
+              onClick={() => setBetBalance(bet?.type === "balance" ? bet.amount : 25)}
+            >
+              Balance
+            </Button>
+          </div>
+
+          {bet?.type === "balance" ? (
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-xs text-white/55">
+                <span>Amount</span>
+                <span className="font-semibold text-white/85">${fmtMoney(bet.amount)}</span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={500}
+                step={1}
+                value={bet.amount}
+                onChange={(e) => setBetBalance(Number(e.target.value))}
+                className="mt-2 w-full accent-violet-400"
+              />
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setBetBalance(25)}>
+                  $25
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => setBetBalance(100)}>
+                  $100
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => setBetBalance(250)}>
+                  $250
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+
         <div className="rounded-2xl bg-white/5 p-3 ring-soft">
           <div className="flex items-center justify-between">
             <div className="text-xs uppercase tracking-wider text-white/50">Multiplier</div>
@@ -142,33 +193,7 @@ export function UpgradeControls() {
             )}
           </div>
         </div>
-
-        <div className="rounded-2xl bg-white/5 p-3 ring-soft">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-white/50">
-              <Dice5 className="h-4 w-4 text-emerald-300" /> Quick bet
-            </div>
-            <div className="text-xs text-white/55">
-              Inv: {inventory.length} • Bal: ${fmtMoney(balance)}
-            </div>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (inventory[0]?.instanceId) useUpgradeStore.getState().selectBetSkin(inventory[0].instanceId);
-                else toast.error("No skins in inventory");
-              }}
-            >
-              Pick 1st skin
-            </Button>
-            <Button variant="secondary" onClick={() => useUpgradeStore.getState().setBetBalance(25)}>
-              Bet $25
-            </Button>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
 }
-
