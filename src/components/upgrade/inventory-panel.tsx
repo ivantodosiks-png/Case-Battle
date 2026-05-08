@@ -16,11 +16,8 @@ export function InventoryPanel() {
   const bet = useUpgradeStore((s) => s.bet);
   const addTestSkins = useUpgradeStore((s) => s.addTestSkins);
   const selectBetSkin = useUpgradeStore((s) => s.selectBetSkin);
-  const setBetBalance = useUpgradeStore((s) => s.setBetBalance);
 
   const selectedInstanceId = bet?.type === "skin" ? bet.skinInstanceId : null;
-  const betAmount = bet?.type === "balance" ? bet.amount : 25;
-
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
@@ -41,18 +38,8 @@ export function InventoryPanel() {
         </div>
 
         {bet?.type === "balance" ? (
-          <div className="mt-3 rounded-2xl bg-white/5 p-3 ring-soft">
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-white/60">Bet amount</div>
-              <div className="text-xs text-white/50">min 1.00</div>
-            </div>
-            <input
-              inputMode="decimal"
-              value={String(betAmount)}
-              onChange={(e) => setBetBalance(Number(e.target.value))}
-              className="mt-2 h-11 w-full rounded-xl bg-black/30 px-3 text-sm text-white/92 ring-soft outline-none focus:ring-2 focus:ring-violet-400/50"
-              placeholder="25"
-            />
+          <div className="mt-3 rounded-2xl bg-white/4 p-3 text-xs text-white/60 ring-soft">
+            Balance stake is set on the right panel.
           </div>
         ) : (
           <div className="mt-3 rounded-2xl bg-white/4 p-3 text-xs text-white/60 ring-soft">

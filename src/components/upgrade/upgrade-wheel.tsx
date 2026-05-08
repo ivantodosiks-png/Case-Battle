@@ -73,9 +73,9 @@ export function UpgradeWheel() {
     setPhase("spinning");
 
     // Variable "physics" (visual only)
-    const baseTurns = 4 + Math.floor(Math.random() * 4); // 4..7
+    const baseTurns = 5 + Math.floor(Math.random() * 5); // 5..9
     const profile = Math.random();
-    const durationMs = profile < 0.2 ? 1200 : profile < 0.65 ? 2200 : 3600;
+    const durationMs = profile < 0.2 ? 2600 : profile < 0.65 ? 3900 : 5200;
     const extraTurns = profile < 0.1 ? 10 : 0; // sometimes hyper fast
 
     const win = res.win;
@@ -166,16 +166,16 @@ export function UpgradeWheel() {
 
               {/* Center */}
               <div className="absolute inset-0 grid place-items-center">
-                <div className="glass relative w-[68%] rounded-[28px] p-4 text-center shadow-glow">
-                  <div className="text-[11px] uppercase tracking-[0.25em] text-white/55">
-                    {centerStatus}
-                  </div>
-                  <div className="mt-1 text-3xl font-semibold text-white/92">
-                    x{Number(multiplier).toFixed(multiplier === 2 || multiplier === 5 || multiplier === 10 ? 0 : 2)}
-                  </div>
-                  <div className="mt-2 text-xs text-white/55">
-                    Stake <span className="text-white/88 font-semibold">${fmtMoney(stakeValue)}</span> • Payout{" "}
-                    <span className="text-white/88 font-semibold">${fmtMoney(payoutValue)}</span>
+                <div className="relative grid h-[54%] w-[54%] place-items-center rounded-full bg-black/25 ring-soft shadow-glow">
+                  <div className="pointer-events-none absolute -inset-10 bg-gradient-to-b from-violet-500/12 via-transparent to-transparent blur-2xl" />
+                  <div className="text-center">
+                    <div className="text-[11px] uppercase tracking-[0.25em] text-white/50">{centerStatus}</div>
+                    <div className="mt-1 text-3xl font-semibold text-white/92">
+                      x{Number(multiplier).toFixed(multiplier === 2 || multiplier === 5 || multiplier === 10 ? 0 : 2)}
+                    </div>
+                    <div className="mt-2 text-[11px] text-white/55">
+                      ${fmtMoney(stakeValue)} → ${fmtMoney(payoutValue)}
+                    </div>
                   </div>
 
                   <AnimatePresence initial={false}>
@@ -199,8 +199,6 @@ export function UpgradeWheel() {
                       </motion.div>
                     ) : null}
                   </AnimatePresence>
-
-                  <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-white/12 to-transparent opacity-70 blur-xl" />
                 </div>
               </div>
             </div>

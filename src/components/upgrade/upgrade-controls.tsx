@@ -20,6 +20,10 @@ export function UpgradeControls() {
   const setMultiplier = useUpgradeStore((s) => s.setMultiplier);
   const clearBet = useUpgradeStore((s) => s.clearBet);
   const setBetBalance = useUpgradeStore((s) => s.setBetBalance);
+  const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
+  const targetReady = useUpgradeStore((s) => s.targetReady);
+  const catalog = useUpgradeStore((s) => s.catalog);
+  const setTargetSkinId = useUpgradeStore((s) => s.setTargetSkinId);
 
   const chance = useMemo(() => clamp(1 / Number(multiplier || 2), 0.05, 0.95), [multiplier]);
 
@@ -32,18 +36,12 @@ export function UpgradeControls() {
 
   const payoutValue = useMemo(() => Math.round(stakeValue * multiplier * 100) / 100, [stakeValue, multiplier]);
 
-  const previewRewardSkin = useMemo(() => {
-    const wanted = payoutValue;
-    const close = Array.from(SKIN_BY_ID.values())
-      .filter((s) => s.price <= wanted * 1.02)
-      .sort((a, b) => Math.abs(wanted - a.price) - Math.abs(wanted - b.price))[0];
-    return close;
-  }, [payoutValue]);
+  const previewRewardSkin = useMemo(() => (targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined), [targetSkinId]);
 
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
-        <CardTitle>Upgrade</CardTitle>
+        <CardTitle>Upgrade settings</CardTitle>
         <Button size="sm" variant="ghost" onClick={clearBet} disabled={!bet}>
           Clear bet
         </Button>
@@ -177,7 +175,7 @@ export function UpgradeControls() {
           </div>
 
           <div className="mt-3">
-            {previewRewardSkin ? (
+            {targetReady && previewRewardSkin ? (
               <SkinCard
                 skin={previewRewardSkin}
                 footer={
@@ -186,11 +184,39 @@ export function UpgradeControls() {
                   </div>
                 }
               />
-            ) : (
+            ) : targetReady ? (
               <div className="rounded-2xl bg-black/25 p-4 text-sm text-white/60 ring-soft">
                 No skin fits this payout. Balance credit fallback.
               </div>
+            ) : (
+              <div className="rounded-2xl bg-black/25 p-4 text-sm text-white/60 ring-soft">
+                Pick x2/x5/x10 or % to calculate the target item.
+              </div>
             )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-white/5 p-3 ring-soft">
+          <div className="flex items-center justify-between">
+            <div className="text-xs uppercase tracking-wider text-white/50">Skins</div>
+            <div className="text-xs text-white/55">{targetReady ? "Pick target" : "Pick x / % first"}</div>
+          </div>
+          <div className="mt-3 grid max-h-[320px] grid-cols-1 gap-2 overflow-auto pr-1">
+            {catalog
+              .slice()
+              .sort((a, b) => b.price - a.price)
+              .map((skin) => (
+                <div
+                  key={skin.id}
+                  className={targetReady ? "" : "opacity-40 pointer-events-none"}
+                  onClick={() => {
+                    if (!bet) return toast.error("Set a stake first");
+                    setTargetSkinId(skin.id);
+                  }}
+                >
+                  <SkinCard skin={skin} selected={skin.id === targetSkinId} />
+                </div>
+              ))}
           </div>
         </div>
       </CardContent>

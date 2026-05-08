@@ -25,6 +25,8 @@ type UpgradeState = {
   inventory: InventoryItem[];
   bet: Bet | null;
   multiplier: UpgradeMultiplier;
+  targetSkinId: string | null;
+  targetReady: boolean;
   spinning: boolean;
   lastResult: UpgradeResponse | null;
   recent: RecentUpgrade[];
@@ -36,6 +38,8 @@ type UpgradeState = {
   selectBetSkin: (instanceId: string) => void;
   setBetBalance: (amount: number) => void;
   setMultiplier: (m: UpgradeMultiplier) => void;
+  recomputeTarget: () => void;
+  setTargetSkinId: (skinId: string | null) => void;
   clearBet: () => void;
   performUpgrade: () => Promise<UpgradeResponse | null>;
   applyOutcomeClientSide: (res: UpgradeResponse) => void;
@@ -60,6 +64,8 @@ export const useUpgradeStore = create<UpgradeState>()(
       inventory: [],
       bet: null,
       multiplier: 2,
+      targetSkinId: null,
+      targetReady: false,
       spinning: false,
       lastResult: null,
       recent: [],
@@ -79,10 +85,46 @@ export const useUpgradeStore = create<UpgradeState>()(
         set((s) => ({ inventory: [...next, ...s.inventory].slice(0, 36) }));
       },
 
-      selectBetSkin: (instanceId) => set(() => ({ bet: { type: "skin", skinInstanceId: instanceId } })),
-      setBetBalance: (amount) => set(() => ({ bet: { type: "balance", amount: clamp(amount, 1, 100000) } })),
-      setMultiplier: (m) => set(() => ({ multiplier: clamp(Number(m), 1.1, 20) })),
-      clearBet: () => set(() => ({ bet: null })),
+      selectBetSkin: (instanceId) =>
+        set(() => ({
+          bet: { type: "skin", skinInstanceId: instanceId },
+          targetSkinId: null,
+          targetReady: false,
+        })),
+      setBetBalance: (amount) =>
+        set(() => ({
+          bet: { type: "balance", amount: clamp(amount, 1, 100000) },
+          targetSkinId: null,
+          targetReady: false,
+        })),
+      setMultiplier: (m) => {
+        const next = clamp(Number(m), 1.1, 20);
+        set(() => ({ multiplier: next, targetReady: true }));
+        get().recomputeTarget();
+      },
+      recomputeTarget: () => {
+        const s = get();
+        if (!s.bet || !s.targetReady) {
+          set(() => ({ targetSkinId: null }));
+          return;
+        }
+        const stakeValue =
+          s.bet.type === "balance"
+            ? s.bet.amount
+            : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
+        const payoutValue = Math.round(stakeValue * Number(s.multiplier) * 100) / 100;
+        // Pick the closest affordable skin as the "desired" preview (demo behavior).
+        const close = Array.from(SKIN_BY_ID.values())
+          .filter((skin) => skin.price <= payoutValue * 1.02)
+          .sort((a, b) => Math.abs(payoutValue - a.price) - Math.abs(payoutValue - b.price))[0];
+        set(() => ({ targetSkinId: close?.id ?? null }));
+      },
+      setTargetSkinId: (skinId) =>
+        set(() => ({
+          targetSkinId: skinId,
+          targetReady: true,
+        })),
+      clearBet: () => set(() => ({ bet: null, targetSkinId: null, targetReady: false })),
 
       performUpgrade: async () => {
         const s = get();
@@ -161,6 +203,8 @@ export const useUpgradeStore = create<UpgradeState>()(
         set((st) => ({
           spinning: false,
           bet: null,
+          targetSkinId: null,
+          targetReady: false,
           recent: [recentItem, ...st.recent].slice(0, 18),
           fakeOnline: clamp(st.fakeOnline + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 4)), 980, 3920),
           fakeJackpot: Math.round((st.fakeJackpot + (Math.random() < 0.6 ? 1 : -1) * (40 + Math.floor(Math.random() * 220))) * 1),
