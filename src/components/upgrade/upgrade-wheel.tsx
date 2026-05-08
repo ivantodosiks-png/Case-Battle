@@ -80,8 +80,15 @@ export function UpgradeWheel() {
     const loseSpan = 360 - winSpan;
     const winStart = 180 - winSpan / 2; // win sector centered at bottom
 
-    // Pointer always lands clearly inside the filled (win) or empty (lose) sector.
-    const finalAngle = res.win ? winStart + winSpan * 0.5 : winStart + winSpan + loseSpan * 0.5;
+    // Pointer always lands clearly inside the filled (win) or empty (lose) sector,
+    // but the stop position is randomized within that sector (not always top/bottom).
+    const margin = 10; // degrees away from the sector edges
+    const pickInSpan = (start: number, span: number) => {
+      const safe = Math.max(0, span - margin * 2);
+      if (safe <= 1) return start + span * 0.5;
+      return start + margin + Math.random() * safe;
+    };
+    const finalAngle = res.win ? pickInSpan(winStart, winSpan) : pickInSpan(winStart + winSpan, loseSpan);
 
     const target = rotation.get() + baseTurns * 360 + finalAngle;
 
