@@ -28,6 +28,7 @@ export type UpgradeRequest = {
   betSkinInstanceId?: string;
   betAmount?: number;
   targetSkinId: string;
+  userId?: string; // client-side demo id, used for drop logging
 };
 
 export type UpgradeResponse = {

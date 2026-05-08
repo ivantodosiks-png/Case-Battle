@@ -13,6 +13,40 @@ function round2(n: number) {
   return Math.round(n * 100) / 100;
 }
 
+async function logDropToSupabase(input: {
+  userId: string;
+  seed: string;
+  stakeValue: number;
+  targetSkinId: string;
+  chancePct: number;
+  roll: number;
+  rewardSkinId: string;
+}) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceRole) return;
+
+  // Supabase PostgREST insert
+  await fetch(`${url}/rest/v1/user_drops`, {
+    method: "POST",
+    headers: {
+      apikey: serviceRole,
+      authorization: `Bearer ${serviceRole}`,
+      "content-type": "application/json",
+      prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      user_id: input.userId,
+      seed: input.seed,
+      stake_value: input.stakeValue,
+      target_skin_id: input.targetSkinId,
+      chance_pct: input.chancePct,
+      roll: input.roll,
+      reward_skin_id: input.rewardSkinId,
+    }),
+  });
+}
+
 export async function POST(req: Request) {
   let body: UpgradeRequest;
   try {
@@ -74,6 +108,22 @@ export async function POST(req: Request) {
     targetValue,
     rewardSkinId,
   };
+
+  if (win && rewardSkinId && body.userId) {
+    try {
+      await logDropToSupabase({
+        userId: body.userId,
+        seed,
+        stakeValue,
+        targetSkinId,
+        chancePct,
+        roll,
+        rewardSkinId,
+      });
+    } catch {
+      // best-effort: never fail the upgrade because of logging
+    }
+  }
 
   return NextResponse.json(res);
 }

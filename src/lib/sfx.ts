@@ -35,6 +35,35 @@ function tone(freq: number, durMs: number, type: OscillatorType, gain: number, w
   osc.stop(t0 + durMs / 1000 + 0.02);
 }
 
+function noiseBurst(durMs: number, gain: number, when = 0, hpHz = 1200) {
+  const e = getEnv();
+  if (!e) return;
+  const t0 = e.ctx.currentTime + when;
+
+  const buffer = e.ctx.createBuffer(1, Math.floor((e.ctx.sampleRate * durMs) / 1000), e.ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+
+  const src = e.ctx.createBufferSource();
+  src.buffer = buffer;
+
+  const hp = e.ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.setValueAtTime(hpHz, t0);
+
+  const g = e.ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + durMs / 1000);
+
+  src.connect(hp);
+  hp.connect(g);
+  g.connect(e.master);
+
+  src.start(t0);
+  src.stop(t0 + durMs / 1000 + 0.02);
+}
+
 export async function sfxPrime() {
   const e = getEnv();
   if (!e) return;
@@ -42,7 +71,9 @@ export async function sfxPrime() {
 }
 
 export function sfxSpinTick(intensity = 1) {
-  tone(220 + 180 * intensity, 45, "square", 0.08);
+  // roulette-like click: short noise + tiny pitch blip
+  noiseBurst(18, 0.06 + 0.06 * intensity, 0, 1400 + 600 * intensity);
+  tone(140 + 90 * intensity, 22, "triangle", 0.03 + 0.03 * intensity, 0.0);
 }
 
 export function sfxWin() {

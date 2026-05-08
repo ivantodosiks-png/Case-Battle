@@ -22,6 +22,7 @@ type Bet =
   | { type: "balance"; amount: number };
 
 type UpgradeState = {
+  userId: string;
   balance: number;
   inventory: InventoryItem[];
   bet: Bet | null;
@@ -64,6 +65,7 @@ function clamp(n: number, a: number, b: number) {
 export const useUpgradeStore = create<UpgradeState>()(
   persist(
     (set, get) => ({
+      userId: crypto.randomUUID(),
       balance: 420.0,
       inventory: [],
       bet: null,
@@ -177,8 +179,8 @@ export const useUpgradeStore = create<UpgradeState>()(
         try {
           const payload =
             s.bet.type === "skin"
-              ? { betType: "skin", betSkinInstanceId: s.bet.skinInstanceId, targetSkinId: s.targetSkinId }
-              : { betType: "balance", betAmount: s.bet.amount, targetSkinId: s.targetSkinId };
+              ? { betType: "skin", betSkinInstanceId: s.bet.skinInstanceId, targetSkinId: s.targetSkinId, userId: s.userId }
+              : { betType: "balance", betAmount: s.bet.amount, targetSkinId: s.targetSkinId, userId: s.userId };
 
           const res = await fetch("/api/upgrade", {
             method: "POST",
@@ -249,7 +251,7 @@ export const useUpgradeStore = create<UpgradeState>()(
     }),
     {
       name: "cb-upgrade-demo",
-      version: 2,
+      version: 3,
       migrate: (persisted: unknown, version) => {
         // v2 reset: start with balance-only; keep everything else if present.
         if (version < 2) {
@@ -258,9 +260,17 @@ export const useUpgradeStore = create<UpgradeState>()(
           }
           return { inventory: [] };
         }
+        if (version < 3) {
+          if (persisted && typeof persisted === "object") {
+            const p = persisted as Record<string, unknown>;
+            return { ...p, userId: typeof p.userId === "string" ? p.userId : crypto.randomUUID() };
+          }
+          return { userId: crypto.randomUUID() };
+        }
         return persisted;
       },
       partialize: (s) => ({
+        userId: s.userId,
         balance: s.balance,
         inventory: s.inventory,
         recent: s.recent,
