@@ -110,7 +110,52 @@ export const SKINS: Skin[] = [
     wear: "Factory New",
     price: 1.65,
     gradient: RARITY_COLOR.consumer,
-  }
+  },
+  {
+    id: "m4a4-neo-temple",
+    name: "M4A4 | Neo Temple",
+    image: img("M4A4 | Neo Temple"),
+    rarity: "classified",
+    wear: "Minimal Wear",
+    price: 220,
+    gradient: RARITY_COLOR.classified,
+  },
+  {
+    id: "knife-butterfly-aurora",
+    name: "★ Butterfly Knife | Aurora",
+    image: img("★ Butterfly Knife | Aurora"),
+    rarity: "knife",
+    wear: "Field-Tested",
+    price: 2100,
+    gradient: RARITY_COLOR.knife,
+  },
+  {
+    id: "sg553-hypnotic-grid",
+    name: "SG 553 | Hypnotic Grid",
+    image: img("SG 553 | Hypnotic Grid"),
+    rarity: "restricted",
+    wear: "Factory New",
+    price: 78,
+    gradient: RARITY_COLOR.restricted,
+  },
+  {
+    id: "mp9-velvet-hex",
+    name: "MP9 | Velvet Hex",
+    image: img("MP9 | Velvet Hex"),
+    rarity: "milspec",
+    wear: "Well-Worn",
+    price: 12,
+    gradient: RARITY_COLOR.milspec,
+  },
+  {
+    id: "galil-echo-strike",
+    name: "Galil AR | Echo Strike",
+    image: img("Galil AR | Echo Strike"),
+    rarity: "industrial",
+    wear: "Field-Tested",
+    price: 6.5,
+    gradient: RARITY_COLOR.industrial,
+  },
 ];
 
 export const SKIN_BY_ID = new Map(SKINS.map((s) => [s.id, s]));
