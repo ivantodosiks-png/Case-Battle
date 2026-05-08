@@ -57,39 +57,72 @@ export function UpgradeControls() {
             </div>
           </div>
 
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            <Button size="sm" variant={Number(multiplier) === 2 ? "primary" : "secondary"} onClick={() => setMultiplier(2)} disabled={!bet}>
+          <div className="mt-2 grid grid-cols-6 gap-1.5">
+            <Button
+              size="sm"
+              className="h-8 px-2 text-xs"
+              variant={Number(multiplier) === 2 ? "primary" : "secondary"}
+              onClick={() => setMultiplier(2)}
+              disabled={!bet}
+            >
               x2
             </Button>
-            <Button size="sm" variant={Number(multiplier) === 5 ? "primary" : "secondary"} onClick={() => setMultiplier(5)} disabled={!bet}>
+            <Button
+              size="sm"
+              className="h-8 px-2 text-xs"
+              variant={Number(multiplier) === 5 ? "primary" : "secondary"}
+              onClick={() => setMultiplier(5)}
+              disabled={!bet}
+            >
               x5
             </Button>
-            <Button size="sm" variant={Number(multiplier) === 10 ? "primary" : "secondary"} onClick={() => setMultiplier(10)} disabled={!bet}>
+            <Button
+              size="sm"
+              className="h-8 px-2 text-xs"
+              variant={Number(multiplier) === 10 ? "primary" : "secondary"}
+              onClick={() => setMultiplier(10)}
+              disabled={!bet}
+            >
               x10
             </Button>
-          </div>
-
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            <Button size="sm" variant={Math.round(chancePct) === 75 ? "primary" : "secondary"} onClick={() => setMultiplier(1 / 0.75)} disabled={!bet}>
+            <Button
+              size="sm"
+              className="h-8 px-2 text-xs"
+              variant={Math.round(chancePct) === 75 ? "primary" : "secondary"}
+              onClick={() => setMultiplier(1 / 0.75)}
+              disabled={!bet}
+            >
               75%
             </Button>
-            <Button size="sm" variant={Math.round(chancePct) === 50 ? "primary" : "secondary"} onClick={() => setMultiplier(2)} disabled={!bet}>
+            <Button
+              size="sm"
+              className="h-8 px-2 text-xs"
+              variant={Math.round(chancePct) === 50 ? "primary" : "secondary"}
+              onClick={() => setMultiplier(2)}
+              disabled={!bet}
+            >
               50%
             </Button>
-            <Button size="sm" variant={Math.round(chancePct) === 30 ? "primary" : "secondary"} onClick={() => setMultiplier(1 / 0.3)} disabled={!bet}>
+            <Button
+              size="sm"
+              className="h-8 px-2 text-xs"
+              variant={Math.round(chancePct) === 30 ? "primary" : "secondary"}
+              onClick={() => setMultiplier(1 / 0.3)}
+              disabled={!bet}
+            >
               30%
             </Button>
           </div>
 
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/25 ring-soft">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/25 ring-soft">
             <div
               className="h-full bg-gradient-to-r from-emerald-400/70 via-sky-400/55 to-violet-400/70"
               style={{ width: `${clamp(chancePct, 0, 100)}%` }}
             />
           </div>
 
-          <div className="mt-2 flex items-center gap-2 text-xs text-white/55">
-            <Percent className="h-3.5 w-3.5" /> Выберите x/% чтобы подсчитать цель, либо выберите скин вручную.
+          <div className="mt-1.5 flex items-center gap-2 text-[11px] text-white/55">
+            <Percent className="h-3.5 w-3.5" /> x/% → цель и шанс
           </div>
         </div>
 
