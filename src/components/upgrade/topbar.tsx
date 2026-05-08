@@ -1,15 +1,28 @@
 "use client";
 
-import { Activity, Flame, Sparkles } from "lucide-react";
+import { Activity, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Counter } from "@/components/ui/counter";
+import { Button } from "@/components/ui/button";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
 import { fmtMoney } from "@/lib/money";
+import { useEffect, useState } from "react";
 
 export function Topbar() {
   const balance = useUpgradeStore((s) => s.balance);
   const online = useUpgradeStore((s) => s.fakeOnline);
-  const jackpot = useUpgradeStore((s) => s.fakeJackpot);
+  const lastBonusAt = useUpgradeStore((s) => s.lastBonusAt);
+  const grantBonus = useUpgradeStore((s) => s.grantBonus);
+  const [nowTs, setNowTs] = useState(() => Date.now());
+
+  useEffect(() => {
+    const t = window.setInterval(() => setNowTs(Date.now()), 400);
+    return () => window.clearInterval(t);
+  }, []);
+
+  const cdMs = 30_000;
+  const remaining = Math.max(0, cdMs - (nowTs - (lastBonusAt || 0)));
+  const canBonus = remaining === 0;
 
   return (
     <div className="px-3 pt-4 sm:px-6">
@@ -26,12 +39,22 @@ export function Topbar() {
           <Stat icon={<Activity className="h-4 w-4" />} label="Online">
             <Counter value={online} format={(v) => Math.round(v).toLocaleString()} durationMs={900} />
           </Stat>
-          <Stat icon={<Flame className="h-4 w-4" />} label="Jackpot">
-            $<Counter value={jackpot} format={(v) => Math.round(v).toLocaleString()} durationMs={900} />
-          </Stat>
           <Stat icon={<Sparkles className="h-4 w-4" />} label="Balance">
             $<Counter value={balance} format={fmtMoney} />
           </Stat>
+          <Card className="flex items-center gap-3 px-3 py-2">
+            <Button
+              size="sm"
+              variant={canBonus ? "primary" : "secondary"}
+              disabled={!canBonus}
+              onClick={() => {
+                const ok = grantBonus();
+                if (!ok) return;
+              }}
+            >
+              +$500{canBonus ? "" : ` (${Math.ceil(remaining / 1000)}s)`}
+            </Button>
+          </Card>
         </div>
       </div>
     </div>
@@ -59,4 +82,3 @@ function Stat({
     </Card>
   );
 }
-

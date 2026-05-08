@@ -27,6 +27,7 @@ type UpgradeState = {
   multiplier: UpgradeMultiplier;
   targetSkinId: string | null;
   targetReady: boolean;
+  lastBonusAt: number;
   spinning: boolean;
   lastResult: UpgradeResponse | null;
   recent: RecentUpgrade[];
@@ -40,6 +41,7 @@ type UpgradeState = {
   setMultiplier: (m: UpgradeMultiplier) => void;
   recomputeTarget: () => void;
   setTargetSkinId: (skinId: string | null) => void;
+  grantBonus: () => boolean;
   clearBet: () => void;
   performUpgrade: () => Promise<UpgradeResponse | null>;
   applyOutcomeClientSide: (res: UpgradeResponse) => void;
@@ -66,6 +68,7 @@ export const useUpgradeStore = create<UpgradeState>()(
       multiplier: 2,
       targetSkinId: null,
       targetReady: false,
+      lastBonusAt: 0,
       spinning: false,
       lastResult: null,
       recent: [],
@@ -124,6 +127,17 @@ export const useUpgradeStore = create<UpgradeState>()(
           targetSkinId: skinId,
           targetReady: true,
         })),
+      grantBonus: () => {
+        const s = get();
+        const nowTs = now();
+        const cdMs = 30_000;
+        if (s.lastBonusAt && nowTs - s.lastBonusAt < cdMs) return false;
+        set((st) => ({
+          balance: Math.round((st.balance + 500) * 100) / 100,
+          lastBonusAt: nowTs,
+        }));
+        return true;
+      },
       clearBet: () => set(() => ({ bet: null, targetSkinId: null, targetReady: false })),
 
       performUpgrade: async () => {
@@ -213,12 +227,24 @@ export const useUpgradeStore = create<UpgradeState>()(
     }),
     {
       name: "cb-upgrade-demo",
+      version: 2,
+      migrate: (persisted: unknown, version) => {
+        // v2 reset: start with balance-only; keep everything else if present.
+        if (version < 2) {
+          if (persisted && typeof persisted === "object") {
+            return { ...(persisted as Record<string, unknown>), inventory: [] };
+          }
+          return { inventory: [] };
+        }
+        return persisted;
+      },
       partialize: (s) => ({
         balance: s.balance,
         inventory: s.inventory,
         recent: s.recent,
         fakeOnline: s.fakeOnline,
         fakeJackpot: s.fakeJackpot,
+        lastBonusAt: s.lastBonusAt,
       }),
     }
   )

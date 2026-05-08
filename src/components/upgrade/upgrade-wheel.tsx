@@ -72,7 +72,7 @@ export function UpgradeWheel() {
     // Slow, heavy spin (visual only)
     const baseTurns = 7 + Math.floor(Math.random() * 6); // 7..12
     const profile = Math.random();
-    const durationMs = profile < 0.2 ? 6500 : profile < 0.7 ? 8000 : 9800;
+    const durationMs = profile < 0.2 ? 7800 : profile < 0.7 ? 9500 : 11500;
 
     const winSpan = 360 * chance;
     const loseSpan = 360 - winSpan;
@@ -90,13 +90,14 @@ export function UpgradeWheel() {
 
     const t0 = performance.now();
     let lastTick = 0;
+    const startAngle = rotation.get();
     const tick = (t: number) => {
       if (abort.signal.aborted) return;
       const p = clamp((t - t0) / durationMs, 0, 1);
-      const easeOut = 1 - Math.pow(1 - p, 3.2);
-      rotation.set(rotation.get() + (target - rotation.get()) * (0.08 + 0.08 * (1 - easeOut)));
+      const easeOut = 1 - Math.pow(1 - p, 3.6);
+      rotation.set(startAngle + (target - startAngle) * easeOut);
 
-      if (t - lastTick > 75) {
+      if (t - lastTick > 95) {
         sfxSpinTick(0.3 + 0.7 * p);
         lastTick = t;
       }
@@ -137,6 +138,16 @@ export function UpgradeWheel() {
             <div className="absolute inset-0 rounded-[999px] bg-gradient-to-b from-white/10 to-white/5 ring-soft shadow-[0_0_90px_rgba(139,92,246,0.14)]" />
 
             <LiquidDial chance={chance} />
+
+            {/* Percent inside the circle */}
+            <div className="pointer-events-none absolute inset-0 grid place-items-center">
+              <div className="rounded-full bg-black/10 px-4 py-2 text-center ring-soft backdrop-blur-sm">
+                <div className="text-[11px] uppercase tracking-[0.32em] text-white/50">chance</div>
+                <div className="mt-0.5 text-3xl font-semibold text-white/92 tabular-nums">
+                  {Math.round(chance * 100)}%
+                </div>
+              </div>
+            </div>
 
             {/* Pointer */}
             <motion.div className="absolute inset-0" style={{ rotate: smoothRotation }}>
@@ -217,4 +228,3 @@ function LiquidDial({ chance }: { chance: number }) {
     </div>
   );
 }
-

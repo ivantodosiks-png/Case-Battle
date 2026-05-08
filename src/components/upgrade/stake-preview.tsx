@@ -39,11 +39,16 @@ export function StakePreview() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
           <div className="absolute bottom-3 left-3 right-3">
             <div className="text-sm font-semibold text-white/90">{stake ? stake.title : "—"}</div>
-            <div className="mt-0.5 text-xs text-white/55">{stake ? stake.subtitle : "Pick a skin (bottom-left) or balance (right panel)."}</div>
+            <div className="mt-0.5 text-xs text-white/55">
+              {stake ? (
+                <span className="break-words">{stake.subtitle}</span>
+              ) : (
+                "Set bet amount on the left slider, then spin."
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 }
-

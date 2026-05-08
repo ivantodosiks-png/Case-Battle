@@ -40,14 +40,14 @@ export function SkinCard({
         }}
       />
       <div className="relative flex items-center gap-3 p-3">
-        <div className="relative h-12 w-16 overflow-hidden rounded-xl bg-black/20 ring-soft">
+        <div className="relative h-14 w-20 overflow-hidden rounded-xl bg-black/20 ring-soft">
           <Image src={skin.image} alt={skin.name} fill className="object-cover opacity-90" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-semibold text-white/92">{skin.name}</div>
           <div className="mt-0.5 flex items-center justify-between gap-2">
             <div className="truncate text-xs text-white/55">{skin.wear}</div>
-            <div className="text-xs font-semibold text-white/85">${fmtMoney(skin.price)}</div>
+            <div className="shrink-0 text-xs font-semibold text-white/90">${fmtMoney(skin.price)}</div>
           </div>
           {footer ? <div className="mt-2">{footer}</div> : null}
         </div>
@@ -56,4 +56,3 @@ export function SkinCard({
     </motion.button>
   );
 }
-
