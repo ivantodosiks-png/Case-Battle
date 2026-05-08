@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SkinCard } from "@/components/upgrade/skin-card";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
+import { SKIN_BY_ID } from "@/lib/skins";
 
 function clamp(n: number, a: number, b: number) {
   return Math.min(b, Math.max(a, n));
@@ -21,8 +22,14 @@ export function UpgradeControls() {
   const targetReady = useUpgradeStore((s) => s.targetReady);
   const catalog = useUpgradeStore((s) => s.catalog);
   const setTargetSkinId = useUpgradeStore((s) => s.setTargetSkinId);
+  const setTargetFromSkinPrice = useUpgradeStore((s) => s.setTargetFromSkinPrice);
 
   const chance = useMemo(() => clamp(1 / Number(multiplier || 2), 0.05, 0.95), [multiplier]);
+  const stakeValue = useMemo(() => {
+    if (!bet) return 0;
+    if (bet.type === "balance") return bet.amount;
+    return SKIN_BY_ID.get(bet.skinInstanceId.split("::")[1])?.price ?? 0;
+  }, [bet]);
 
   return (
     <Card className="overflow-hidden">
@@ -82,10 +89,18 @@ export function UpgradeControls() {
               .map((skin) => (
                 <div
                   key={skin.id}
-                  className={targetReady ? "" : "pointer-events-none opacity-40"}
+                  className={
+                    !targetReady
+                      ? "pointer-events-none opacity-40"
+                      : skin.price < stakeValue
+                        ? "pointer-events-none opacity-30"
+                        : ""
+                  }
                   onClick={() => {
                     if (!bet) return toast.error("Set a stake first");
+                    if (skin.price < stakeValue) return;
                     setTargetSkinId(skin.id);
+                    setTargetFromSkinPrice(skin.price);
                   }}
                 >
                   <SkinCard skin={skin} selected={skin.id === targetSkinId} />
@@ -97,4 +112,3 @@ export function UpgradeControls() {
     </Card>
   );
 }
-

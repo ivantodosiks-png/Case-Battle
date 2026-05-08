@@ -11,6 +11,7 @@ export function TargetPreview() {
   const targetReady = useUpgradeStore((s) => s.targetReady);
   const bet = useUpgradeStore((s) => s.bet);
   const multiplier = useUpgradeStore((s) => s.multiplier);
+  const recomputeTarget = useUpgradeStore((s) => s.recomputeTarget);
 
   const skin = targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined;
 
@@ -28,6 +29,16 @@ export function TargetPreview() {
         <CardTitle>Choose weapon you want to receive</CardTitle>
       </CardHeader>
       <CardContent>
+        {bet ? (
+          <div className="mb-3">
+            <button
+              className="w-full rounded-xl bg-white/5 px-3 py-2 text-left text-xs text-white/65 ring-soft hover:bg-white/6"
+              onClick={() => recomputeTarget()}
+            >
+              Recalculate target from x / %
+            </button>
+          </div>
+        ) : null}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-black/25 ring-soft">
           <div className="absolute inset-0 opacity-70" style={{ background: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06), transparent 55%)" }} />
           {skin?.image ? (

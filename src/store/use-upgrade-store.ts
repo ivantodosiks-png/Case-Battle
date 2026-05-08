@@ -41,6 +41,7 @@ type UpgradeState = {
   setMultiplier: (m: UpgradeMultiplier) => void;
   recomputeTarget: () => void;
   setTargetSkinId: (skinId: string | null) => void;
+  setTargetFromSkinPrice: (targetPrice: number) => void;
   grantBonus: () => boolean;
   clearBet: () => void;
   performUpgrade: () => Promise<UpgradeResponse | null>;
@@ -57,6 +58,12 @@ function mkInstanceId(skinId: string) {
 
 function clamp(n: number, a: number, b: number) {
   return Math.min(b, Math.max(a, n));
+}
+
+function stakeValueFromBet(bet: Bet | null) {
+  if (!bet) return 0;
+  if (bet.type === "balance") return bet.amount;
+  return SKIN_BY_ID.get(bet.skinInstanceId.split("::")[1])?.price ?? 0;
 }
 
 export const useUpgradeStore = create<UpgradeState>()(
@@ -111,22 +118,32 @@ export const useUpgradeStore = create<UpgradeState>()(
           set(() => ({ targetSkinId: null }));
           return;
         }
-        const stakeValue =
-          s.bet.type === "balance"
-            ? s.bet.amount
-            : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
-        const payoutValue = Math.round(stakeValue * Number(s.multiplier) * 100) / 100;
-        // Pick the closest affordable skin as the "desired" preview (demo behavior).
-        const close = Array.from(SKIN_BY_ID.values())
-          .filter((skin) => skin.price <= payoutValue * 1.02)
-          .sort((a, b) => Math.abs(payoutValue - a.price) - Math.abs(payoutValue - b.price))[0];
-        set(() => ({ targetSkinId: close?.id ?? null }));
+        const stakeValue = stakeValueFromBet(s.bet);
+        const targetValue = Math.round(stakeValue * Number(s.multiplier) * 100) / 100;
+        // Target must be >= stake. Choose closest skin around targetValue.
+        const candidates = Array.from(SKIN_BY_ID.values()).filter((skin) => skin.price >= stakeValue);
+        const close = candidates
+          .filter((skin) => skin.price <= targetValue * 1.08)
+          .sort((a, b) => Math.abs(targetValue - a.price) - Math.abs(targetValue - b.price))[0];
+        // If nothing near target, pick the cheapest valid upgrade skin.
+        const fallback = candidates.sort((a, b) => a.price - b.price)[0];
+        set(() => ({ targetSkinId: (close ?? fallback)?.id ?? null }));
       },
       setTargetSkinId: (skinId) =>
         set(() => ({
           targetSkinId: skinId,
           targetReady: true,
         })),
+      setTargetFromSkinPrice: (targetPrice) => {
+        const s = get();
+        const stake = stakeValueFromBet(s.bet);
+        const m = stake > 0 ? targetPrice / stake : 2;
+        set(() => ({
+          multiplier: clamp(m, 1.1, 20),
+          targetReady: true,
+        }));
+        get().recomputeTarget();
+      },
       grantBonus: () => {
         const s = get();
         const nowTs = now();
