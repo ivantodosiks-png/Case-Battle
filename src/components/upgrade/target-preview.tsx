@@ -8,6 +8,8 @@ import { useUpgradeStore } from "@/store/use-upgrade-store";
 
 export function TargetPreview() {
   const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
+  const bet = useUpgradeStore((s) => s.bet);
+  const recomputeTarget = useUpgradeStore((s) => s.recomputeTarget);
   const skin = targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined;
 
   return (
@@ -16,6 +18,16 @@ export function TargetPreview() {
         <CardTitle>Выбранный скин</CardTitle>
       </CardHeader>
       <CardContent>
+        {bet ? (
+          <div className="mb-3">
+            <button
+              className="w-full rounded-xl bg-white/5 px-3 py-2 text-left text-xs text-white/65 ring-soft hover:bg-white/6"
+              onClick={() => recomputeTarget()}
+            >
+              Пересчитать цель по x / %
+            </button>
+          </div>
+        ) : null}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-black/25 ring-soft">
           <div
             className="absolute inset-0 opacity-70"
@@ -41,4 +53,3 @@ export function TargetPreview() {
     </Card>
   );
 }
-

@@ -25,7 +25,9 @@ type UpgradeState = {
   balance: number;
   inventory: InventoryItem[];
   bet: Bet | null;
+  multiplier: number;
   targetSkinId: string | null;
+  targetReady: boolean;
   lastBonusAt: number;
   spinning: boolean;
   lastResult: UpgradeResponse | null;
@@ -37,7 +39,10 @@ type UpgradeState = {
   addTestSkins: (count?: number) => void;
   selectBetSkin: (instanceId: string) => void;
   setBetBalance: (amount: number) => void;
+  setMultiplier: (m: number) => void;
+  recomputeTarget: () => void;
   setTargetSkinId: (skinId: string | null) => void;
+  setTargetFromSkinPrice: (targetPrice: number) => void;
   grantBonus: () => boolean;
   clearBet: () => void;
   performUpgrade: () => Promise<UpgradeResponse | null>;
@@ -62,7 +67,9 @@ export const useUpgradeStore = create<UpgradeState>()(
       balance: 420.0,
       inventory: [],
       bet: null,
+      multiplier: 2,
       targetSkinId: null,
+      targetReady: false,
       lastBonusAt: 0,
       spinning: false,
       lastResult: null,
@@ -87,16 +94,65 @@ export const useUpgradeStore = create<UpgradeState>()(
         set(() => ({
           bet: { type: "skin", skinInstanceId: instanceId },
           targetSkinId: null,
+          targetReady: false,
         })),
       setBetBalance: (amount) =>
         set(() => ({
           bet: { type: "balance", amount: clamp(amount, 1, 100000) },
           targetSkinId: null,
+          targetReady: false,
         })),
+      setMultiplier: (m) => {
+        const next = clamp(Number(m), 1.1, 20);
+        set(() => ({ multiplier: next, targetReady: true }));
+        get().recomputeTarget();
+      },
+      recomputeTarget: () => {
+        const s = get();
+        if (!s.bet || !s.targetReady) {
+          set(() => ({ targetSkinId: null }));
+          return;
+        }
+
+        const stakeValue =
+          s.bet.type === "balance"
+            ? s.bet.amount
+            : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
+
+        if (!stakeValue) {
+          set(() => ({ targetSkinId: null }));
+          return;
+        }
+
+        const targetValue = Math.round(stakeValue * Number(s.multiplier) * 100) / 100;
+
+        const candidates = Array.from(SKIN_BY_ID.values()).filter((skin) => skin.price > stakeValue);
+        const close = candidates
+          .filter((skin) => skin.price <= targetValue * 1.08)
+          .sort((a, b) => Math.abs(targetValue - a.price) - Math.abs(targetValue - b.price))[0];
+        const fallback = candidates.sort((a, b) => a.price - b.price)[0];
+
+        set(() => ({ targetSkinId: (close ?? fallback)?.id ?? null }));
+      },
       setTargetSkinId: (skinId) =>
         set(() => ({
           targetSkinId: skinId,
+          targetReady: true,
         })),
+      setTargetFromSkinPrice: (targetPrice) => {
+        const s = get();
+        if (!s.bet) return;
+        const stake =
+          s.bet.type === "balance"
+            ? s.bet.amount
+            : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
+        const m = stake > 0 ? targetPrice / stake : 2;
+        set(() => ({
+          multiplier: clamp(m, 1.1, 20),
+          targetReady: true,
+        }));
+        get().recomputeTarget();
+      },
       grantBonus: () => {
         const s = get();
         const nowTs = now();
@@ -108,7 +164,7 @@ export const useUpgradeStore = create<UpgradeState>()(
         }));
         return true;
       },
-      clearBet: () => set(() => ({ bet: null, targetSkinId: null })),
+      clearBet: () => set(() => ({ bet: null, targetSkinId: null, targetReady: false })),
 
       performUpgrade: async () => {
         const s = get();
@@ -184,6 +240,7 @@ export const useUpgradeStore = create<UpgradeState>()(
           spinning: false,
           bet: null,
           targetSkinId: null,
+          targetReady: false,
           recent: [recentItem, ...st.recent].slice(0, 18),
           fakeOnline: clamp(st.fakeOnline + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 4)), 980, 3920),
           fakeJackpot: Math.round((st.fakeJackpot + (Math.random() < 0.6 ? 1 : -1) * (40 + Math.floor(Math.random() * 220))) * 1),
