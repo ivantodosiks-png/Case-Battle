@@ -13,8 +13,7 @@ export function RecentFeed() {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
-        <CardTitle>Recent upgrades</CardTitle>
-        <div className="text-xs text-white/50">Live feed (demo)</div>
+        <CardTitle>Последние апгрейды</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
@@ -26,12 +25,13 @@ export function RecentFeed() {
                 animate={{ opacity: 1 }}
                 className="rounded-2xl bg-white/4 p-4 text-sm text-white/60 ring-soft"
               >
-                No spins yet. Try an upgrade.
+                Пока нет апгрейдов.
               </motion.div>
             ) : null}
 
             {recent.map((r) => {
               const reward = r.rewardSkinId ? SKIN_BY_ID.get(r.rewardSkinId) : undefined;
+              const target = r.targetSkinId ? SKIN_BY_ID.get(r.targetSkinId) : undefined;
               return (
                 <motion.div
                   key={r.id}
@@ -62,17 +62,11 @@ export function RecentFeed() {
                           </span>
                         )}
                         <span className="text-xs text-white/55">
-                          ${fmtMoney(r.stakeValue)} → x{Number(r.multiplier).toFixed(r.multiplier === 2 || r.multiplier === 5 || r.multiplier === 10 ? 0 : 2)}
+                          {fmtMoney(r.stakeValue)} ₽ → {fmtMoney(r.targetValue)} ₽ • {r.chancePct.toFixed(2)}%
                         </span>
                       </div>
                       <div className="truncate text-xs text-white/55">
-                        {r.win
-                          ? reward
-                            ? `Reward skin: ${reward.name}`
-                            : `Balance credited: $${fmtMoney(r.payoutValue)}`
-                          : r.cashbackValue > 0
-                            ? `Cashback: +$${fmtMoney(r.cashbackValue)}`
-                            : "No cashback"}
+                        {r.win ? (reward ? `Reward: ${reward.name}` : "Reward") : target ? `Target: ${target.name}` : "Target"}
                       </div>
                     </div>
                   </div>
@@ -90,4 +84,3 @@ export function RecentFeed() {
     </Card>
   );
 }
-

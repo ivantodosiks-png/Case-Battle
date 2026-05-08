@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import type { UpgradeRequest, UpgradeResponse } from "@/lib/types";
-import { SKIN_BY_ID, pickRewardSkinId } from "@/lib/skins";
-import { secureRandomFloat01, secureRandomInt } from "@/lib/random";
+import { SKIN_BY_ID } from "@/lib/skins";
+import { secureRandomInt } from "@/lib/random";
 
 export const runtime = "nodejs";
 
-function chanceFromMultiplier(multiplier: number) {
-  return 1 / multiplier;
+function clamp(n: number, a: number, b: number) {
+  return Math.min(b, Math.max(a, n));
 }
 
 export async function POST(req: Request) {
@@ -17,12 +17,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const multiplier = Number(body.multiplier);
-  if (!Number.isFinite(multiplier) || multiplier < 1.05 || multiplier > 20) {
-    return NextResponse.json({ ok: false, error: "Invalid multiplier" }, { status: 400 });
+  const targetSkinId = body.targetSkinId;
+  const targetSkin = targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined;
+  if (!targetSkin) {
+    return NextResponse.json({ ok: false, error: "Unknown target skin" }, { status: 400 });
   }
-
-  const chance = Math.min(0.95, Math.max(0.05, chanceFromMultiplier(multiplier)));
 
   let stakeValue = 0;
   if (body.betType === "balance") {
@@ -47,26 +46,28 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Invalid betType" }, { status: 400 });
   }
 
-  const roll = secureRandomFloat01();
-  const win = roll < chance;
+  const targetValue = targetSkin.price;
+  if (!Number.isFinite(targetValue) || targetValue <= 0) {
+    return NextResponse.json({ ok: false, error: "Invalid target price" }, { status: 400 });
+  }
+  if (targetValue <= stakeValue) {
+    return NextResponse.json({ ok: false, error: "Target must be more expensive" }, { status: 400 });
+  }
 
-  const payoutValue = Math.round(stakeValue * multiplier * 100) / 100;
-  const cashbackPct = win ? 0 : secureRandomInt(1, 5) / 100;
-  const cashbackValue = Math.round(stakeValue * cashbackPct * 100) / 100;
-
-  const rewardSkinId = win ? pickRewardSkinId(payoutValue, secureRandomFloat01) : undefined;
+  const chancePct = clamp((stakeValue / targetValue) * 100, 0, 100);
+  const roll = secureRandomInt(0, 10_000) / 100; // 0..100 (2 decimals)
+  const win = roll <= chancePct;
+  const rewardSkinId = win ? targetSkinId : undefined;
   const seed = `${Date.now()}-${secureRandomInt(100000, 999999)}`;
 
   const res: UpgradeResponse = {
     ok: true,
     seed,
-    chance,
-    multiplier,
+    chancePct,
     roll,
     win,
     stakeValue,
-    payoutValue,
-    cashbackValue,
+    targetValue,
     rewardSkinId,
   };
 

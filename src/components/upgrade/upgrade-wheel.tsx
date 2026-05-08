@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SKIN_BY_ID } from "@/lib/skins";
 import { fmtMoney } from "@/lib/money";
-import { sfxCashback, sfxLose, sfxPrime, sfxSpinTick, sfxWin } from "@/lib/sfx";
+import { sfxLose, sfxPrime, sfxSpinTick, sfxWin } from "@/lib/sfx";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
 
 function clamp(n: number, a: number, b: number) {
@@ -30,20 +30,28 @@ function inSector(angleDeg: number, startDeg: number, spanDeg: number) {
 
 export function UpgradeWheel() {
   const bet = useUpgradeStore((s) => s.bet);
-  const multiplier = useUpgradeStore((s) => s.multiplier);
+  const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
   const spinning = useUpgradeStore((s) => s.spinning);
   const lastResult = useUpgradeStore((s) => s.lastResult);
   const performUpgrade = useUpgradeStore((s) => s.performUpgrade);
   const applyOutcome = useUpgradeStore((s) => s.applyOutcomeClientSide);
 
-  const chance = useMemo(() => clamp(1 / Number(multiplier || 2), 0.05, 0.95), [multiplier]);
   const stakeValue = useMemo(() => {
     if (!bet) return 0;
     if (bet.type === "balance") return bet.amount;
     const skinId = bet.skinInstanceId.split("::")[1];
     return SKIN_BY_ID.get(skinId)?.price ?? 0;
   }, [bet]);
-  const payoutValue = useMemo(() => Math.round(stakeValue * Number(multiplier) * 100) / 100, [stakeValue, multiplier]);
+  const targetValue = useMemo(() => {
+    if (!targetSkinId) return 0;
+    return SKIN_BY_ID.get(targetSkinId)?.price ?? 0;
+  }, [targetSkinId]);
+
+  const chancePct = useMemo(() => {
+    if (!stakeValue || !targetValue) return 0;
+    return clamp((stakeValue / targetValue) * 100, 0, 100);
+  }, [stakeValue, targetValue]);
+  const chance = useMemo(() => clamp(chancePct / 100, 0, 1), [chancePct]);
 
   const rotation = useMotionValue(0);
   const smoothRotation = useSpring(rotation, { stiffness: 95, damping: 22, mass: 0.7 });
@@ -52,14 +60,18 @@ export function UpgradeWheel() {
 
   async function spin() {
     if (!bet) {
-      toast.error("Set a stake first");
+      toast.error("Выберите текущий скин");
+      return;
+    }
+    if (!targetSkinId) {
+      toast.error("Выберите скин для апгрейда");
       return;
     }
     await sfxPrime();
 
     const res = await performUpgrade();
     if (!res) {
-      toast.error("Upgrade failed");
+      toast.error("Ошибка апгрейда");
       return;
     }
 
@@ -74,11 +86,18 @@ export function UpgradeWheel() {
     const profile = Math.random();
     const durationMs = profile < 0.2 ? 7800 : profile < 0.7 ? 9500 : 11500;
 
-    const winSpan = 360 * chance;
+    const resChance = clamp(res.chancePct / 100, 0, 1);
+    const winSpan = 360 * resChance;
     const loseSpan = 360 - winSpan;
     const winStart = 180 - winSpan / 2; // win sector centered at bottom
 
-    const localT = res.win ? res.roll / chance : (res.roll - chance) / (1 - chance);
+    const localT = res.win
+      ? res.chancePct > 0
+        ? res.roll / res.chancePct
+        : 0
+      : 100 - res.chancePct > 0
+        ? (res.roll - res.chancePct) / (100 - res.chancePct)
+        : 0;
     const offsetWithin = (res.win ? winSpan : loseSpan) * clamp(localT, 0, 1);
     let finalAngle = res.win ? winStart + offsetWithin : winStart + winSpan + offsetWithin;
 
@@ -110,13 +129,10 @@ export function UpgradeWheel() {
           applyOutcome(res);
           if (res.win) {
             sfxWin();
-            toast.success("WIN");
+            toast.success("Апгрейд успешный");
           } else {
             sfxLose();
-            if (res.cashbackValue > 0) {
-              window.setTimeout(() => sfxCashback(), 160);
-              toast("Cashback", { description: `+$${fmtMoney(res.cashbackValue)}` });
-            } else toast.error("LOSE");
+            toast.error("Апгрейд не удался");
           }
           setPhase("idle");
         }, 450);
@@ -129,8 +145,8 @@ export function UpgradeWheel() {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
-        <CardTitle>Upgrade</CardTitle>
-        <div className="text-xs text-white/60">{Math.round(chance * 100)}%</div>
+        <CardTitle>Апгрейд</CardTitle>
+        <div className="text-xs text-white/60">{chancePct.toFixed(2)}%</div>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
         <div className="relative mx-auto w-full max-w-[860px]">
@@ -142,9 +158,9 @@ export function UpgradeWheel() {
             {/* Percent inside the circle */}
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <div className="rounded-full bg-black/10 px-4 py-2 text-center ring-soft backdrop-blur-sm">
-                <div className="text-[11px] uppercase tracking-[0.32em] text-white/50">chance</div>
+                <div className="text-[11px] uppercase tracking-[0.32em] text-white/50">Шанс</div>
                 <div className="mt-0.5 text-3xl font-semibold text-white/92 tabular-nums">
-                  {Math.round(chance * 100)}%
+                  {chancePct.toFixed(2)}%
                 </div>
               </div>
             </div>
@@ -168,11 +184,12 @@ export function UpgradeWheel() {
         </div>
 
         <div className="mt-4 w-full max-w-[860px]">
-          <Button size="lg" className="w-full" onClick={spin} disabled={!bet || spinning || phase !== "idle"}>
-            {spinning || phase !== "idle" ? "Spinning..." : "UPGRADE"}
+          <Button size="lg" className="w-full" onClick={spin} disabled={!bet || !targetSkinId || spinning || phase !== "idle"}>
+            {spinning || phase !== "idle" ? "Крутим..." : "АПГРЕЙД"}
           </Button>
           <div className="mt-2 text-center text-xs text-white/50">
-            Stake ${fmtMoney(stakeValue)} → Potential ${fmtMoney(payoutValue)}
+            {stakeValue ? `Ставка ${fmtMoney(stakeValue)} ₽` : ""}
+            {targetValue ? ` → Цель ${fmtMoney(targetValue)} ₽` : ""}
             {lastResult ? (lastResult.win ? " • WIN" : " • LOSE") : ""}
           </div>
         </div>
@@ -182,7 +199,7 @@ export function UpgradeWheel() {
 }
 
 function LiquidDial({ chance }: { chance: number }) {
-  const fill = clamp(chance, 0.05, 0.95);
+  const fill = clamp(chance, 0, 1);
   const y = 100 - fill * 100;
   return (
     <div className="absolute inset-3 overflow-hidden rounded-[999px] ring-soft bg-black/25">

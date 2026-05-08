@@ -23,24 +23,20 @@ export type InventoryItem = {
   acquiredAt: number;
 };
 
-export type UpgradeMultiplier = number;
-
 export type UpgradeRequest = {
   betType: "skin" | "balance";
   betSkinInstanceId?: string;
   betAmount?: number;
-  multiplier: UpgradeMultiplier;
+  targetSkinId: string;
 };
 
 export type UpgradeResponse = {
   ok: true;
   seed: string;
-  chance: number; // 0..1
-  multiplier: UpgradeMultiplier;
-  roll: number; // 0..1
+  chancePct: number; // 0..100
+  roll: number; // 0..100
   win: boolean;
   stakeValue: number;
-  payoutValue: number;
-  cashbackValue: number;
-  rewardSkinId?: string; // if available
+  targetValue: number;
+  rewardSkinId?: string;
 };

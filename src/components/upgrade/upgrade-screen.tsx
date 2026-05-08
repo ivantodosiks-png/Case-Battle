@@ -1,25 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { toast } from "sonner";
 import { Topbar } from "@/components/upgrade/topbar";
 import { InventoryPanel } from "@/components/upgrade/inventory-panel";
 import { UpgradeWheel } from "@/components/upgrade/upgrade-wheel";
 import { UpgradeControls } from "@/components/upgrade/upgrade-controls";
 import { StakePreview } from "@/components/upgrade/stake-preview";
 import { TargetPreview } from "@/components/upgrade/target-preview";
-import { useUpgradeStore } from "@/store/use-upgrade-store";
 
 export function UpgradeScreen() {
-  const addTestSkins = useUpgradeStore((s) => s.addTestSkins);
-
-  useEffect(() => {
-    // Keep demo minimal: start with balance-only. User can still add test skins manually.
-    toast.message("Demo mode", {
-      description: "No Steam, no payments, no auth — just a smooth upgrader MVP.",
-    });
-  }, [addTestSkins]);
-
   return (
     <div className="min-h-screen overflow-hidden pb-6">
       <Topbar />
@@ -44,3 +32,4 @@ export function UpgradeScreen() {
     </div>
   );
 }
+

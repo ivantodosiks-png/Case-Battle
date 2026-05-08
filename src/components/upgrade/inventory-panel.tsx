@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { RefreshCw, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Counter } from "@/components/ui/counter";
@@ -22,35 +22,23 @@ export function InventoryPanel() {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
-        <CardTitle>Balance</CardTitle>
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={() =>
-            useUpgradeStore.setState((s) => ({
-              balance: Math.round((s.balance + 50) * 100) / 100,
-            }))
-          }
-          title="Add demo balance"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <CardTitle>Баланс</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between rounded-2xl bg-white/5 px-3 py-2 ring-soft">
           <div className="flex items-center gap-2 text-white/70">
             <Wallet className="h-4 w-4" />
-            <span className="text-xs uppercase tracking-wider">Balance</span>
+            <span className="text-xs uppercase tracking-wider">Баланс</span>
           </div>
           <div className="text-sm font-semibold text-white/92">
-            $<Counter value={balance} format={fmtMoney} />
+            <Counter value={balance} format={fmtMoney} /> ₽
           </div>
         </div>
 
         <div className="mt-3 rounded-2xl bg-white/5 p-3 ring-soft">
           <div className="flex items-center justify-between text-xs text-white/55">
-            <span>Bet amount</span>
-            <span className="font-semibold text-white/85">${fmtMoney(betAmount)}</span>
+            <span>Ставка</span>
+            <span className="font-semibold text-white/85">{fmtMoney(betAmount)} ₽</span>
           </div>
           <input
             type="range"
@@ -59,23 +47,23 @@ export function InventoryPanel() {
             step={1}
             value={betAmount}
             onChange={(e) => setBetBalance(Number(e.target.value))}
-            className="mt-2 w-full accent-violet-400"
-          />
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            <Button size="sm" variant="secondary" onClick={() => setBetBalance(25)}>
-              $25
-            </Button>
-            <Button size="sm" variant="secondary" onClick={() => setBetBalance(100)}>
-              $100
-            </Button>
-            <Button size="sm" variant="secondary" onClick={() => setBetBalance(250)}>
-              $250
-            </Button>
-          </div>
+          className="mt-2 w-full accent-violet-400"
+        />
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          <Button size="sm" variant="secondary" onClick={() => setBetBalance(25)}>
+            25 ₽
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => setBetBalance(100)}>
+            100 ₽
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => setBetBalance(250)}>
+            250 ₽
+          </Button>
         </div>
+      </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-xs uppercase tracking-wider text-white/50">My items</div>
+          <div className="text-xs uppercase tracking-wider text-white/50">Мои предметы</div>
           <div className="text-xs text-white/50">{inventory.length}/36</div>
         </div>
 
@@ -101,7 +89,7 @@ export function InventoryPanel() {
 
           {inventory.length === 0 ? (
             <div className="rounded-2xl bg-white/4 p-4 text-sm text-white/60 ring-soft">
-              No items (demo). Upgrade with balance only.
+              Инвентарь пуст.
             </div>
           ) : null}
         </div>

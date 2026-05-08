@@ -47,7 +47,7 @@ export function SkinCard({
           <div className="truncate text-sm font-semibold text-white/92">{skin.name}</div>
           <div className="mt-0.5 flex items-center justify-between gap-2">
             <div className="truncate text-xs text-white/55">{skin.wear}</div>
-            <div className="shrink-0 text-xs font-semibold text-white/90">${fmtMoney(skin.price)}</div>
+            <div className="shrink-0 text-xs font-semibold text-white/90">{fmtMoney(skin.price)} ₽</div>
           </div>
           {footer ? <div className="mt-2">{footer}</div> : null}
         </div>
