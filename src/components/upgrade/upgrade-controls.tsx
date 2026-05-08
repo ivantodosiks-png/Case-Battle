@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Percent } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,9 @@ export function UpgradeControls() {
   const setTargetSkinId = useUpgradeStore((s) => s.setTargetSkinId);
   const setTargetFromSkinPrice = useUpgradeStore((s) => s.setTargetFromSkinPrice);
 
+  const [page, setPage] = useState(1);
+  const pageSize = 12;
+
   const stakeValue = useMemo(() => {
     if (!bet) return 0;
     if (bet.type === "balance") return bet.amount;
@@ -39,6 +42,15 @@ export function UpgradeControls() {
     if (!stakeValue || !targetValue) return 0;
     return Math.round(clamp((stakeValue / targetValue) * 100, 0, 100) * 100) / 100;
   }, [stakeValue, targetValue]);
+
+  const sortedCatalog = useMemo(() => catalog.slice().sort((a, b) => b.price - a.price), [catalog]);
+  const pageCount = Math.max(1, Math.ceil(sortedCatalog.length / pageSize));
+  useEffect(() => setPage((p) => clamp(p, 1, pageCount)), [pageCount]);
+
+  const pageItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return sortedCatalog.slice(start, start + pageSize);
+  }, [page, sortedCatalog]);
 
   return (
     <Card className="overflow-hidden">
@@ -133,27 +145,41 @@ export function UpgradeControls() {
               {!bet ? "Сначала выберите текущий скин" : targetReady ? "Выберите скин дороже вашего" : "Сначала выберите параметры"}
             </div>
           </div>
-          <div className="mt-3 max-h-[calc(100vh-420px)] min-h-[320px] overflow-auto pr-1">
+
+          <div className="mt-3">
             <div className="grid grid-cols-2 gap-2">
-              {catalog
-                .slice()
-                .sort((a, b) => b.price - a.price)
-                .map((skin) => (
-                  <div
-                    key={skin.id}
-                    className={!bet || !targetReady ? "pointer-events-none opacity-40" : ""}
-                    onClick={() => {
-                      if (!bet) return toast.error("Сначала выберите текущий скин");
-                      if (!targetReady) return;
-                      if (skin.price <= stakeValue) return;
-                      setTargetSkinId(skin.id);
-                      setTargetFromSkinPrice(skin.price);
-                    }}
-                  >
-                    <SkinTile skin={skin} selected={skin.id === targetSkinId} disabled={skin.price <= stakeValue} />
-                  </div>
-                ))}
+              {pageItems.map((skin) => (
+                <div
+                  key={skin.id}
+                  className={!bet || !targetReady ? "pointer-events-none opacity-40" : ""}
+                  onClick={() => {
+                    if (!bet) return toast.error("Сначала выберите текущий скин");
+                    if (!targetReady) return;
+                    if (skin.price <= stakeValue) return;
+                    setTargetSkinId(skin.id);
+                    setTargetFromSkinPrice(skin.price);
+                  }}
+                >
+                  <SkinTile skin={skin} selected={skin.id === targetSkinId} disabled={skin.price <= stakeValue} />
+                </div>
+              ))}
             </div>
+
+            {pageCount > 1 ? (
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                {Array.from({ length: pageCount }, (_, idx) => idx + 1).map((p) => (
+                  <Button
+                    key={p}
+                    size="sm"
+                    variant={p === page ? "primary" : "secondary"}
+                    className="h-8 w-8 p-0 text-xs"
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
       </CardContent>

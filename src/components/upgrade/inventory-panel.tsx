@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,10 @@ import { fmtMoney } from "@/lib/money";
 import { SKIN_BY_ID } from "@/lib/skins";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
 
+function clamp(n: number, a: number, b: number) {
+  return Math.min(b, Math.max(a, n));
+}
+
 export function InventoryPanel() {
   const balance = useUpgradeStore((s) => s.balance);
   const inventory = useUpgradeStore((s) => s.inventory);
@@ -19,6 +24,17 @@ export function InventoryPanel() {
 
   const selectedInstanceId = bet?.type === "skin" ? bet.skinInstanceId : null;
   const betAmount = bet?.type === "balance" ? bet.amount : 25;
+
+  const [page, setPage] = useState(1);
+  const pageSize = 18; // 3 cols x 6 rows
+  const pageCount = Math.max(1, Math.ceil(inventory.length / pageSize));
+  useEffect(() => setPage((p) => clamp(p, 1, pageCount)), [pageCount]);
+
+  const pageItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return inventory.slice(start, start + pageSize);
+  }, [inventory, page]);
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex items-center justify-between gap-3">
@@ -47,30 +63,32 @@ export function InventoryPanel() {
             step={1}
             value={betAmount}
             onChange={(e) => setBetBalance(Number(e.target.value))}
-          className="mt-2 w-full accent-violet-400"
-        />
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          <Button size="sm" variant="secondary" onClick={() => setBetBalance(25)}>
-            25 ₽
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => setBetBalance(100)}>
-            100 ₽
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => setBetBalance(250)}>
-            250 ₽
-          </Button>
+            className="mt-2 w-full accent-violet-400"
+          />
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setBetBalance(25)}>
+              25 ₽
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setBetBalance(100)}>
+              100 ₽
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setBetBalance(250)}>
+              250 ₽
+            </Button>
+          </div>
         </div>
-      </div>
 
         <div className="mt-4 flex items-center justify-between">
           <div className="text-xs uppercase tracking-wider text-white/50">Мои предметы</div>
-          <div className="text-xs text-white/50">{inventory.length}/36</div>
+          <div className="text-xs text-white/50">
+            {inventory.length}/36
+          </div>
         </div>
 
-        <div className="mt-3 max-h-[56vh] overflow-auto pr-1">
+        <div className="mt-3">
           <AnimatePresence initial={false}>
             <div className="grid grid-cols-3 gap-2">
-              {inventory.map((it) => {
+              {pageItems.map((it) => {
                 const skin = SKIN_BY_ID.get(it.skinId);
                 if (!skin) return null;
                 const selected = selectedInstanceId === it.instanceId;
@@ -90,8 +108,22 @@ export function InventoryPanel() {
           </AnimatePresence>
 
           {inventory.length === 0 ? (
-            <div className="rounded-2xl bg-white/4 p-4 text-sm text-white/60 ring-soft">
-              Инвентарь пуст.
+            <div className="rounded-2xl bg-white/4 p-4 text-sm text-white/60 ring-soft">Инвентарь пуст.</div>
+          ) : null}
+
+          {pageCount > 1 ? (
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+              {Array.from({ length: pageCount }, (_, idx) => idx + 1).map((p) => (
+                <Button
+                  key={p}
+                  size="sm"
+                  variant={p === page ? "primary" : "secondary"}
+                  className="h-8 w-8 p-0 text-xs"
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
             </div>
           ) : null}
         </div>

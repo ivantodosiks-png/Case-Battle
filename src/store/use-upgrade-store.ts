@@ -118,7 +118,7 @@ export const useUpgradeStore = create<UpgradeState>()(
           targetReady: false,
         })),
       setMultiplier: (m) => {
-        const next = clamp(Number(m), 1.1, 20);
+        const next = clamp(Number(m), 1.01, 2000);
         set(() => ({ multiplier: next, targetReady: true }));
         get().recomputeTarget();
       },
@@ -163,7 +163,7 @@ export const useUpgradeStore = create<UpgradeState>()(
             : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
         const m = stake > 0 ? targetPrice / stake : 2;
         set(() => ({
-          multiplier: clamp(m, 1.1, 20),
+          multiplier: clamp(m, 1.01, 2000),
           targetReady: true,
         }));
         get().recomputeTarget();
