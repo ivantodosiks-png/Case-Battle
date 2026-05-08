@@ -5,7 +5,7 @@ import { Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Counter } from "@/components/ui/counter";
-import { SkinCard } from "@/components/upgrade/skin-card";
+import { SkinTile } from "@/components/upgrade/skin-tile";
 import { fmtMoney } from "@/lib/money";
 import { SKIN_BY_ID } from "@/lib/skins";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
@@ -67,24 +67,26 @@ export function InventoryPanel() {
           <div className="text-xs text-white/50">{inventory.length}/36</div>
         </div>
 
-        <div className="mt-3 max-h-[42vh] space-y-2 overflow-auto pr-1">
+        <div className="mt-3 max-h-[56vh] overflow-auto pr-1">
           <AnimatePresence initial={false}>
-            {inventory.map((it) => {
-              const skin = SKIN_BY_ID.get(it.skinId);
-              if (!skin) return null;
-              const selected = selectedInstanceId === it.instanceId;
-              return (
-                <motion.div
-                  key={it.instanceId}
-                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                  transition={{ duration: 0.18 }}
-                >
-                  <SkinCard skin={skin} selected={selected} onClick={() => selectBetSkin(it.instanceId)} />
-                </motion.div>
-              );
-            })}
+            <div className="grid grid-cols-3 gap-2">
+              {inventory.map((it) => {
+                const skin = SKIN_BY_ID.get(it.skinId);
+                if (!skin) return null;
+                const selected = selectedInstanceId === it.instanceId;
+                return (
+                  <motion.div
+                    key={it.instanceId}
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <SkinTile skin={skin} selected={selected} onClick={() => selectBetSkin(it.instanceId)} />
+                  </motion.div>
+                );
+              })}
+            </div>
           </AnimatePresence>
 
           {inventory.length === 0 ? (

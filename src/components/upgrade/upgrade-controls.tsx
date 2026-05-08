@@ -5,7 +5,7 @@ import { Percent } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SkinCard } from "@/components/upgrade/skin-card";
+import { SkinTile } from "@/components/upgrade/skin-tile";
 import { useUpgradeStore } from "@/store/use-upgrade-store";
 import { SKIN_BY_ID } from "@/lib/skins";
 
@@ -133,20 +133,15 @@ export function UpgradeControls() {
               {!bet ? "Сначала выберите текущий скин" : targetReady ? "Выберите скин дороже вашего" : "Сначала выберите x/%"}
             </div>
           </div>
-          <div className="mt-3 grid max-h-[calc(100vh-520px)] min-h-[220px] grid-cols-1 gap-2 overflow-auto pr-1">
+          <div className="mt-3 max-h-[calc(100vh-420px)] min-h-[320px] overflow-auto pr-1">
+            <div className="grid grid-cols-2 gap-2">
             {catalog
               .slice()
               .sort((a, b) => b.price - a.price)
               .map((skin) => (
                 <div
                   key={skin.id}
-                  className={
-                    !bet || !targetReady
-                      ? "pointer-events-none opacity-40"
-                      : skin.price <= stakeValue
-                        ? "pointer-events-none opacity-30"
-                        : ""
-                  }
+                  className={!bet || !targetReady ? "pointer-events-none opacity-40" : ""}
                   onClick={() => {
                     if (!bet) return toast.error("Выберите текущий скин");
                     if (!targetReady) return;
@@ -155,9 +150,10 @@ export function UpgradeControls() {
                     setTargetFromSkinPrice(skin.price);
                   }}
                 >
-                  <SkinCard skin={skin} selected={skin.id === targetSkinId} />
+                  <SkinTile skin={skin} selected={skin.id === targetSkinId} disabled={skin.price <= stakeValue} />
                 </div>
               ))}
+            </div>
           </div>
         </div>
       </CardContent>
