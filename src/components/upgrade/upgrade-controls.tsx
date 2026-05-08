@@ -51,7 +51,7 @@ export function UpgradeControls() {
       <CardContent className="space-y-3">
         <div className="rounded-2xl bg-white/5 p-3 ring-soft">
           <div className="flex items-center justify-between">
-            <div className="text-xs uppercase tracking-wider text-white/50">x / %</div>
+            <div className="text-xs uppercase tracking-wider text-white/50">Шанс</div>
             <div className="text-xs text-white/60">
               <span className="font-semibold text-white/85">{chancePct.toFixed(2)}%</span>
             </div>
@@ -122,7 +122,7 @@ export function UpgradeControls() {
           </div>
 
           <div className="mt-1.5 flex items-center gap-2 text-[11px] text-white/55">
-            <Percent className="h-3.5 w-3.5" /> x/% → цель и шанс
+            <Percent className="h-3.5 w-3.5" /> Множитель/шанс → цель
           </div>
         </div>
 
@@ -130,29 +130,29 @@ export function UpgradeControls() {
           <div className="flex items-center justify-between">
             <div className="text-xs uppercase tracking-wider text-white/50">Скины</div>
             <div className="text-xs text-white/55">
-              {!bet ? "Сначала выберите текущий скин" : targetReady ? "Выберите скин дороже вашего" : "Сначала выберите x/%"}
+              {!bet ? "Сначала выберите текущий скин" : targetReady ? "Выберите скин дороже вашего" : "Сначала выберите параметры"}
             </div>
           </div>
           <div className="mt-3 max-h-[calc(100vh-420px)] min-h-[320px] overflow-auto pr-1">
             <div className="grid grid-cols-2 gap-2">
-            {catalog
-              .slice()
-              .sort((a, b) => b.price - a.price)
-              .map((skin) => (
-                <div
-                  key={skin.id}
-                  className={!bet || !targetReady ? "pointer-events-none opacity-40" : ""}
-                  onClick={() => {
-                    if (!bet) return toast.error("Выберите текущий скин");
-                    if (!targetReady) return;
-                    if (skin.price <= stakeValue) return;
-                    setTargetSkinId(skin.id);
-                    setTargetFromSkinPrice(skin.price);
-                  }}
-                >
-                  <SkinTile skin={skin} selected={skin.id === targetSkinId} disabled={skin.price <= stakeValue} />
-                </div>
-              ))}
+              {catalog
+                .slice()
+                .sort((a, b) => b.price - a.price)
+                .map((skin) => (
+                  <div
+                    key={skin.id}
+                    className={!bet || !targetReady ? "pointer-events-none opacity-40" : ""}
+                    onClick={() => {
+                      if (!bet) return toast.error("Сначала выберите текущий скин");
+                      if (!targetReady) return;
+                      if (skin.price <= stakeValue) return;
+                      setTargetSkinId(skin.id);
+                      setTargetFromSkinPrice(skin.price);
+                    }}
+                  >
+                    <SkinTile skin={skin} selected={skin.id === targetSkinId} disabled={skin.price <= stakeValue} />
+                  </div>
+                ))}
             </div>
           </div>
         </div>

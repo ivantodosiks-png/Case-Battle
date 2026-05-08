@@ -18,7 +18,6 @@ export function UpgradeWheel() {
   const bet = useUpgradeStore((s) => s.bet);
   const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
   const spinning = useUpgradeStore((s) => s.spinning);
-  const lastResult = useUpgradeStore((s) => s.lastResult);
   const performUpgrade = useUpgradeStore((s) => s.performUpgrade);
   const applyOutcome = useUpgradeStore((s) => s.applyOutcomeClientSide);
 
@@ -46,7 +45,7 @@ export function UpgradeWheel() {
 
   async function spin() {
     if (!bet) {
-      toast.error("Выберите текущий скин");
+      toast.error("Сначала выберите текущий скин/ставку");
       return;
     }
     if (!targetSkinId) {
@@ -77,11 +76,8 @@ export function UpgradeWheel() {
     const loseSpan = 360 - winSpan;
     const winStart = 180 - winSpan / 2; // win sector centered at bottom
 
-    // Keep it simple & unambiguous:
-    // pointer always lands clearly inside the filled (win) or empty (lose) sector.
-    const finalAngle = res.win
-      ? winStart + winSpan * 0.5
-      : winStart + winSpan + loseSpan * 0.5;
+    // Pointer always lands clearly inside the filled (win) or empty (lose) sector.
+    const finalAngle = res.win ? winStart + winSpan * 0.5 : winStart + winSpan + loseSpan * 0.5;
 
     const target = rotation.get() + baseTurns * 360 + finalAngle;
 
@@ -133,17 +129,13 @@ export function UpgradeWheel() {
 
             <LiquidDial chance={chance} />
 
-            {/* Percent inside the circle */}
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <div className="rounded-full bg-black/10 px-4 py-2 text-center ring-soft backdrop-blur-sm">
                 <div className="text-[11px] uppercase tracking-[0.32em] text-white/50">Шанс</div>
-                <div className="mt-0.5 text-3xl font-semibold text-white/92 tabular-nums">
-                  {chancePct.toFixed(2)}%
-                </div>
+                <div className="mt-0.5 text-3xl font-semibold text-white/92 tabular-nums">{chancePct.toFixed(2)}%</div>
               </div>
             </div>
 
-            {/* Pointer */}
             <motion.div className="absolute inset-0" style={{ rotate: smoothRotation }}>
               <div className="absolute left-1/2 top-1 -translate-x-1/2">
                 <div
@@ -168,7 +160,6 @@ export function UpgradeWheel() {
           <div className="mt-2 text-center text-xs text-white/50">
             {stakeValue ? `Ставка ${fmtMoney(stakeValue)} ₽` : ""}
             {targetValue ? ` → Цель ${fmtMoney(targetValue)} ₽` : ""}
-            {lastResult ? (lastResult.win ? " • WIN" : " • LOSE") : ""}
           </div>
         </div>
       </CardContent>
@@ -197,24 +188,6 @@ function LiquidDial({ chance }: { chance: number }) {
           <g clipPath="url(#clipCircle)">
             <rect x="0" y="0" width="100" height="100" fill="rgba(255,255,255,0.03)" />
             <rect x="0" y={y} width="100" height="100" fill="url(#water)" opacity="0.95" />
-
-            <motion.path
-              d="M0,60 C15,56 35,64 50,60 C65,56 85,64 100,60 L100,120 L0,120 Z"
-              fill="rgba(255,255,255,0.14)"
-              style={{ translateY: `${(y - 60) * 0.65}px` }}
-              animate={{ x: [0, -16, 0] }}
-              transition={{ duration: 2.6, ease: "easeInOut", repeat: Infinity }}
-              opacity={0.7}
-            />
-            <motion.path
-              d="M0,60 C18,64 30,56 50,60 C70,64 82,56 100,60 L100,120 L0,120 Z"
-              fill="rgba(255,255,255,0.10)"
-              style={{ translateY: `${(y - 60) * 0.6}px` }}
-              animate={{ x: [0, 22, 0] }}
-              transition={{ duration: 3.4, ease: "easeInOut", repeat: Infinity }}
-              opacity={0.6}
-            />
-
             <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="1.4" />
           </g>
         </svg>

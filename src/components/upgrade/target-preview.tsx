@@ -8,8 +8,6 @@ import { SkinTile } from "@/components/upgrade/skin-tile";
 
 export function TargetPreview() {
   const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
-  const bet = useUpgradeStore((s) => s.bet);
-  const recomputeTarget = useUpgradeStore((s) => s.recomputeTarget);
   const skin = targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined;
 
   return (
@@ -18,16 +16,6 @@ export function TargetPreview() {
         <CardTitle>Выбранный скин</CardTitle>
       </CardHeader>
       <CardContent>
-        {bet ? (
-          <div className="mb-3">
-            <button
-              className="w-full rounded-xl bg-white/5 px-3 py-2 text-left text-xs text-white/65 ring-soft hover:bg-white/6"
-              onClick={() => recomputeTarget()}
-            >
-              Пересчитать цель по x / %
-            </button>
-          </div>
-        ) : null}
         {skin ? (
           <div className="max-w-[420px]">
             <SkinTile skin={skin} selected />
@@ -36,7 +24,9 @@ export function TargetPreview() {
           <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-black/25 ring-soft">
             <div
               className="absolute inset-0 opacity-70"
-              style={{ background: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06), transparent 55%)" }}
+              style={{
+                background: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06), transparent 55%)",
+              }}
             />
             <div className="absolute inset-0 grid place-items-center">
               <div className="text-sm text-white/45">Скин не выбран</div>
