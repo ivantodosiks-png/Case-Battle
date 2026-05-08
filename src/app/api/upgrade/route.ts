@@ -13,6 +13,29 @@ function round2(n: number) {
   return Math.round(n * 100) / 100;
 }
 
+async function fetchSkinFromSupabase(skinId: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return null;
+
+  try {
+    const res = await fetch(`${url}/rest/v1/skins?id=eq.${encodeURIComponent(skinId)}&select=id,price`, {
+      headers: {
+        apikey: anonKey,
+        authorization: `Bearer ${anonKey}`,
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const rows = (await res.json()) as Array<{ id: string; price: number }>;
+    const row = rows[0];
+    if (!row || row.id !== skinId) return null;
+    return { id: row.id, price: Number(row.price) };
+  } catch {
+    return null;
+  }
+}
+
 async function logDropToSupabase(input: {
   userId: string;
   seed: string;
@@ -56,7 +79,8 @@ export async function POST(req: Request) {
   }
 
   const targetSkinId = body.targetSkinId;
-  const targetSkin = targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined;
+  const targetSkin =
+    (targetSkinId ? SKIN_BY_ID.get(targetSkinId) : undefined) ?? (targetSkinId ? await fetchSkinFromSupabase(targetSkinId) : null);
   if (!targetSkin) {
     return NextResponse.json({ ok: false, error: "Unknown target skin" }, { status: 400 });
   }
@@ -75,7 +99,7 @@ export async function POST(req: Request) {
     }
     // Demo: instanceId is client-side. We accept a skin id suffix: "<instance>::<skinId>"
     const skinId = instanceId.split("::")[1];
-    const skin = skinId ? SKIN_BY_ID.get(skinId) : undefined;
+    const skin = (skinId ? SKIN_BY_ID.get(skinId) : undefined) ?? (skinId ? await fetchSkinFromSupabase(skinId) : null);
     if (!skin) {
       return NextResponse.json({ ok: false, error: "Unknown skin" }, { status: 400 });
     }

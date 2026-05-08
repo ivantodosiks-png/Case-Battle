@@ -19,7 +19,6 @@ export function UpgradeControls() {
   const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
   const multiplier = useUpgradeStore((s) => s.multiplier);
   const setMultiplier = useUpgradeStore((s) => s.setMultiplier);
-  const targetReady = useUpgradeStore((s) => s.targetReady);
   const catalog = useUpgradeStore((s) => s.catalog);
   const setTargetSkinId = useUpgradeStore((s) => s.setTargetSkinId);
   const setTargetFromSkinPrice = useUpgradeStore((s) => s.setTargetFromSkinPrice);
@@ -142,7 +141,7 @@ export function UpgradeControls() {
           <div className="flex items-center justify-between">
             <div className="text-xs uppercase tracking-wider text-white/50">Скины</div>
             <div className="text-xs text-white/55">
-              {!bet ? "Сначала выберите текущий скин" : targetReady ? "Выберите скин дороже вашего" : "Сначала выберите параметры"}
+              {!bet ? "Сначала выберите текущий скин" : "Выберите скин (дороже ставки) для апгрейда"}
             </div>
           </div>
 
@@ -151,11 +150,10 @@ export function UpgradeControls() {
               {pageItems.map((skin) => (
                 <div
                   key={skin.id}
-                  className={!bet || !targetReady ? "pointer-events-none opacity-40" : ""}
+                  className={!bet ? "pointer-events-none opacity-40" : ""}
                   onClick={() => {
                     if (!bet) return toast.error("Сначала выберите текущий скин");
-                    if (!targetReady) return;
-                    if (skin.price <= stakeValue) return;
+                    if (skin.price <= stakeValue) return toast.error("Цель должна быть дороже ставки");
                     setTargetSkinId(skin.id);
                     setTargetFromSkinPrice(skin.price);
                   }}

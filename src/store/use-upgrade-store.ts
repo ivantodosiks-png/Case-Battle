@@ -63,6 +63,11 @@ function clamp(n: number, a: number, b: number) {
   return Math.min(b, Math.max(a, n));
 }
 
+function skinByIdFromCatalog(catalog: Skin[], id: string) {
+  // Catalog is expected to be reasonably small; linear scan is fine.
+  return catalog.find((s) => s.id === id);
+}
+
 export const useUpgradeStore = create<UpgradeState>()(
   persist(
     (set, get) => ({
@@ -132,7 +137,9 @@ export const useUpgradeStore = create<UpgradeState>()(
         const stakeValue =
           s.bet.type === "balance"
             ? s.bet.amount
-            : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
+            : skinByIdFromCatalog(s.catalog, s.bet.skinInstanceId.split("::")[1])?.price ??
+              SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ??
+              0;
 
         if (!stakeValue) {
           set(() => ({ targetSkinId: null }));
@@ -141,7 +148,7 @@ export const useUpgradeStore = create<UpgradeState>()(
 
         const targetValue = Math.round(stakeValue * Number(s.multiplier) * 100) / 100;
 
-        const candidates = Array.from(SKIN_BY_ID.values()).filter((skin) => skin.price > stakeValue);
+        const candidates = (s.catalog.length ? s.catalog : SKINS).filter((skin) => skin.price > stakeValue);
         const close = candidates
           .filter((skin) => skin.price <= targetValue * 1.08)
           .sort((a, b) => Math.abs(targetValue - a.price) - Math.abs(targetValue - b.price))[0];
@@ -160,13 +167,15 @@ export const useUpgradeStore = create<UpgradeState>()(
         const stake =
           s.bet.type === "balance"
             ? s.bet.amount
-            : SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ?? 0;
+            : skinByIdFromCatalog(s.catalog, s.bet.skinInstanceId.split("::")[1])?.price ??
+              SKIN_BY_ID.get(s.bet.skinInstanceId.split("::")[1])?.price ??
+              0;
         const m = stake > 0 ? targetPrice / stake : 2;
         set(() => ({
           multiplier: clamp(m, 1.01, 2000),
           targetReady: true,
         }));
-        get().recomputeTarget();
+        // Don't override a manually selected target skin here.
       },
       grantBonus: () => {
         const s = get();

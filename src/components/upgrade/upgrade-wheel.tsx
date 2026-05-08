@@ -17,20 +17,23 @@ function clamp(n: number, a: number, b: number) {
 export function UpgradeWheel() {
   const bet = useUpgradeStore((s) => s.bet);
   const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
+  const catalog = useUpgradeStore((s) => s.catalog);
   const spinning = useUpgradeStore((s) => s.spinning);
   const performUpgrade = useUpgradeStore((s) => s.performUpgrade);
   const applyOutcome = useUpgradeStore((s) => s.applyOutcomeClientSide);
+
+  const catalogById = useMemo(() => new Map(catalog.map((s) => [s.id, s])), [catalog]);
 
   const stakeValue = useMemo(() => {
     if (!bet) return 0;
     if (bet.type === "balance") return bet.amount;
     const skinId = bet.skinInstanceId.split("::")[1];
-    return SKIN_BY_ID.get(skinId)?.price ?? 0;
-  }, [bet]);
+    return catalogById.get(skinId)?.price ?? SKIN_BY_ID.get(skinId)?.price ?? 0;
+  }, [bet, catalogById]);
   const targetValue = useMemo(() => {
     if (!targetSkinId) return 0;
-    return SKIN_BY_ID.get(targetSkinId)?.price ?? 0;
-  }, [targetSkinId]);
+    return catalogById.get(targetSkinId)?.price ?? SKIN_BY_ID.get(targetSkinId)?.price ?? 0;
+  }, [targetSkinId, catalogById]);
 
   const chancePct = useMemo(() => {
     if (!stakeValue || !targetValue) return 0;

@@ -22,19 +22,22 @@ export function UpgradeScreen() {
 
       <main className="mx-auto mt-4 w-full max-w-6xl px-3 sm:px-6">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_1fr_360px]">
-          <div className="order-2 flex min-h-0 flex-col gap-4 lg:order-1">
+          <div className="order-2 flex flex-col gap-4 lg:order-1">
             <StakePreview />
-            <InventoryPanel />
           </div>
 
-          <div className="order-1 min-h-0 lg:order-2">
+          <div className="order-1 lg:order-2">
             <UpgradeWheel />
           </div>
 
-          <div className="order-3 flex min-h-0 flex-col gap-4">
+          <div className="order-3 flex flex-col gap-4">
             <TargetPreview />
-            <UpgradeControls />
           </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <InventoryPanel />
+          <UpgradeControls />
         </div>
       </main>
     </div>
