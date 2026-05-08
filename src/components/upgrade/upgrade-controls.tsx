@@ -25,7 +25,7 @@ export function UpgradeControls() {
   const setTargetFromSkinPrice = useUpgradeStore((s) => s.setTargetFromSkinPrice);
 
   const [page, setPage] = useState(1);
-  const pageSize = 12;
+  const pageSize = 18;
 
   const stakeValue = useMemo(() => {
     if (!bet) return 0;
@@ -147,7 +147,7 @@ export function UpgradeControls() {
           </div>
 
           <div className="mt-3">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-1.5">
               {pageItems.map((skin) => (
                 <div
                   key={skin.id}

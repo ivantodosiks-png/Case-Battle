@@ -26,7 +26,7 @@ export function InventoryPanel() {
   const betAmount = bet?.type === "balance" ? bet.amount : 25;
 
   const [page, setPage] = useState(1);
-  const pageSize = 18; // 3 cols x 6 rows
+  const pageSize = 24; // 4 cols x 6 rows
   const pageCount = Math.max(1, Math.ceil(inventory.length / pageSize));
   useEffect(() => setPage((p) => clamp(p, 1, pageCount)), [pageCount]);
 
@@ -87,7 +87,7 @@ export function InventoryPanel() {
 
         <div className="mt-3">
           <AnimatePresence initial={false}>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-1.5">
               {pageItems.map((it) => {
                 const skin = SKIN_BY_ID.get(it.skinId);
                 if (!skin) return null;

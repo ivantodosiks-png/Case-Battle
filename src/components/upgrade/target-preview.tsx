@@ -30,8 +30,8 @@ export function TargetPreview() {
                 }}
               />
 
-              <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-black/20">
-                <Image src={skin.image} alt={skin.name} fill className="object-contain p-3 opacity-95" />
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black/20">
+                <Image src={skin.image} alt={skin.name} fill className="object-contain p-2 opacity-95" />
                 <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
               </div>
 

@@ -17,11 +17,11 @@ export function UpgradeScreen() {
   }, [loadCatalog]);
 
   return (
-    <div className="min-h-screen overflow-hidden pb-6">
+    <div className="min-h-screen overflow-x-hidden pb-6">
       <Topbar />
 
       <main className="mx-auto mt-4 w-full max-w-6xl px-3 sm:px-6">
-        <div className="grid h-[calc(100vh-124px)] grid-cols-1 gap-4 overflow-hidden lg:grid-cols-[360px_1fr_360px]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_1fr_360px]">
           <div className="order-2 flex min-h-0 flex-col gap-4 lg:order-1">
             <StakePreview />
             <InventoryPanel />

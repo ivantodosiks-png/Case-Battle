@@ -53,14 +53,14 @@ export function SkinTile({
       />
       <div className="relative">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-black/20">
-          <Image src={skin.image} alt={skin.name} fill className="object-contain p-2 opacity-95" />
-          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-          <div className="absolute bottom-2 left-2 right-2 flex items-end justify-between gap-2">
+          <Image src={skin.image} alt={skin.name} fill className="object-contain p-1.5 opacity-95" />
+          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+          <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-end justify-between gap-2">
             <div className="min-w-0">
-              <div className="truncate text-[11px] font-semibold text-white/90">{skin.name}</div>
-              <div className="mt-0.5 text-[10px] font-semibold text-white/75">{wearShort(skin.wear)}</div>
+              <div className="truncate text-[10px] font-semibold text-white/90">{skin.name}</div>
+              <div className="mt-0.5 text-[9px] font-semibold text-white/75">{wearShort(skin.wear)}</div>
             </div>
-            <div className="shrink-0 rounded-lg bg-black/35 px-2 py-1 text-[11px] font-semibold text-white/92 ring-soft">
+            <div className="shrink-0 rounded-md bg-black/35 px-1.5 py-0.5 text-[10px] font-semibold text-white/92 ring-soft">
               {fmtMoney(skin.price)} ₽
             </div>
           </div>
@@ -69,4 +69,3 @@ export function SkinTile({
     </motion.button>
   );
 }
-
