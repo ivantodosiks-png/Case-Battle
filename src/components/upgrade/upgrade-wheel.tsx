@@ -49,7 +49,7 @@ export function UpgradeWheel() {
 
   const chancePct = useMemo(() => {
     if (!stakeValue || !targetValue) return 0;
-    return clamp((stakeValue / targetValue) * 100, 0, 100);
+    return Math.round(clamp((stakeValue / targetValue) * 100, 0, 100) * 100) / 100;
   }, [stakeValue, targetValue]);
   const chance = useMemo(() => clamp(chancePct / 100, 0, 1), [chancePct]);
 
@@ -98,8 +98,14 @@ export function UpgradeWheel() {
       : 100 - res.chancePct > 0
         ? (res.roll - res.chancePct) / (100 - res.chancePct)
         : 0;
-    const offsetWithin = (res.win ? winSpan : loseSpan) * clamp(localT, 0, 1);
-    let finalAngle = res.win ? winStart + offsetWithin : winStart + winSpan + offsetWithin;
+
+    const safePadDeg = 4; // keep pointer away from boundary so it never "looks like" the other outcome
+    const span = res.win ? winSpan : loseSpan;
+    const usableSpan = Math.max(0, span - safePadDeg * 2);
+    const offsetWithin = safePadDeg + usableSpan * clamp(localT, 0, 1);
+    let finalAngle = res.win
+      ? winStart + offsetWithin
+      : winStart + winSpan + (loseSpan > 0 ? offsetWithin : safePadDeg);
 
     const landsInWin = inSector(finalAngle, winStart, winSpan);
     if (res.win && !landsInWin) finalAngle = winStart + winSpan * 0.5;

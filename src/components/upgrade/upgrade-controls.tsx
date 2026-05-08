@@ -37,7 +37,7 @@ export function UpgradeControls() {
 
   const chancePct = useMemo(() => {
     if (!stakeValue || !targetValue) return 0;
-    return clamp((stakeValue / targetValue) * 100, 0, 100);
+    return Math.round(clamp((stakeValue / targetValue) * 100, 0, 100) * 100) / 100;
   }, [stakeValue, targetValue]);
 
   return (

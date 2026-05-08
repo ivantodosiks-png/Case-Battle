@@ -9,6 +9,10 @@ function clamp(n: number, a: number, b: number) {
   return Math.min(b, Math.max(a, n));
 }
 
+function round2(n: number) {
+  return Math.round(n * 100) / 100;
+}
+
 export async function POST(req: Request) {
   let body: UpgradeRequest;
   try {
@@ -54,8 +58,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Target must be more expensive" }, { status: 400 });
   }
 
-  const chancePct = clamp((stakeValue / targetValue) * 100, 0, 100);
-  const roll = secureRandomInt(0, 10_000) / 100; // 0..100 (2 decimals)
+  const chancePct = round2(clamp((stakeValue / targetValue) * 100, 0, 100));
+  const roll = round2(secureRandomInt(0, 10_000) / 100); // 0..100 (2 decimals)
   const win = roll <= chancePct;
   const rewardSkinId = win ? targetSkinId : undefined;
   const seed = `${Date.now()}-${secureRandomInt(100000, 999999)}`;
