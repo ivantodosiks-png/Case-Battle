@@ -2,83 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg0: #05070c;
-  --bg1: #0b0f18;
-  --panel: rgba(10, 14, 22, 0.72);
-  --card: rgba(12, 18, 28, 0.78);
-  --stroke: rgba(255, 255, 255, 0.09);
-  --stroke2: rgba(255, 255, 255, 0.14);
-  --text: rgba(231, 238, 247, 0.92);
-  --muted: rgba(231, 238, 247, 0.62);
-  --muted2: rgba(231, 238, 247, 0.45);
-  --accent: #ff6a1a; /* neon orange */
-  --accent2: #60a5fa; /* cold blue */
-  --danger: #ef4444;
-}
-
 html,
 body {
   height: 100%;
-  width: 100%;
-  max-width: 100%;
 }
 
 body {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans",
-    sans-serif;
-  background: radial-gradient(1200px 700px at 18% 12%, rgba(96, 165, 250, 0.16), transparent 60%),
-    radial-gradient(1000px 650px at 82% 18%, rgba(148, 163, 184, 0.08), transparent 55%),
-    radial-gradient(900px 600px at 55% 92%, rgba(255, 106, 26, 0.10), transparent 55%),
-    linear-gradient(180deg, var(--bg0), var(--bg1));
-  color: var(--text);
-  overflow-x: clip;
+  background: radial-gradient(1200px 700px at 20% 10%, rgba(139, 92, 246, 0.25), transparent 60%),
+    radial-gradient(900px 600px at 70% 20%, rgba(59, 130, 246, 0.18), transparent 55%),
+    radial-gradient(1000px 700px at 55% 90%, rgba(16, 185, 129, 0.10), transparent 60%),
+    linear-gradient(180deg, #05060a 0%, #070812 50%, #05060a 100%);
+  color: rgba(255, 255, 255, 0.92);
 }
 
-* {
-  scrollbar-color: rgba(124, 58, 237, 0.55) rgba(255, 255, 255, 0.08);
-  scrollbar-width: thin;
+.noise {
+  background-image: theme(backgroundImage.noise);
+  background-size: 18px 18px;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .glass {
-    background: var(--panel);
-    border: 1px solid var(--stroke);
-    backdrop-filter: blur(14px);
-  }
-
-  .glass-card {
-    background: var(--card);
-    border: 1px solid var(--stroke);
-    backdrop-filter: blur(14px);
-  }
-
-  .ring-soft {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 60px rgba(0, 0, 0, 0.42);
-  }
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(16px);
 }
 
-@layer components {
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed;
-  }
-  .btn-primary {
-    background: linear-gradient(180deg, rgba(255, 122, 24, 0.95), rgba(255, 122, 24, 0.72));
-    color: black;
-  }
-  .btn-primary:hover {
-    filter: brightness(1.08);
-  }
-  .btn-ghost {
-    @apply bg-black/20 text-white/80 ring-1 ring-white/10 hover:text-white;
-  }
-  .pill {
-    @apply inline-flex items-center rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ring-white/10;
-    background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.75);
-  }
+.ring-soft {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10) inset;
 }
+

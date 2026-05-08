@@ -1,28 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
-import { AppShell } from "@/components/layout/AppShell";
-
-const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" });
-const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" });
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "SKINFORGE",
-  description: "Original dark arcade skin upgrader + cases (local demo)",
+  title: "Upgrade — CaseBattle (Demo)",
+  description: "Modern CS:GO-style upgrader demo (no auth, no payments).",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${orbitron.variable} antialiased font-sans overflow-x-clip`}
-      >
-        <AppShell>{children}</AppShell>
+      <body className="min-h-screen antialiased selection:bg-violet-500/30 selection:text-white">
+        <div className="noise min-h-screen">{children}</div>
+        <Toaster />
       </body>
     </html>
   );
 }
+

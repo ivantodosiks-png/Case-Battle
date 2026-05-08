@@ -1,11 +1,6 @@
-import { catalog } from "@/lib/game/catalog";
-import { CasesGrid } from "@/components/cases/CasesGrid";
+import { UpgradeScreen } from "@/components/upgrade/upgrade-screen";
 
-export default function CasesHomePage() {
-  return (
-    <div className="pb-10">
-      <CasesGrid cases={catalog.cases} />
-    </div>
-  );
+export default function Page() {
+  return <UpgradeScreen />;
 }
 
