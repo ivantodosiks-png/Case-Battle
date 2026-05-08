@@ -14,34 +14,29 @@ export function UpgradeScreen() {
   const addTestSkins = useUpgradeStore((s) => s.addTestSkins);
 
   useEffect(() => {
-    // First run: give users a few items so the UI feels alive.
-    const inv = useUpgradeStore.getState().inventory;
-    if (inv.length === 0) addTestSkins(8);
+    // Keep demo minimal: start with balance-only. User can still add test skins manually.
     toast.message("Demo mode", {
       description: "No Steam, no payments, no auth — just a smooth upgrader MVP.",
     });
   }, [addTestSkins]);
 
   return (
-    <div className="min-h-screen pb-10">
+    <div className="min-h-screen overflow-hidden pb-6">
       <Topbar />
 
       <main className="mx-auto mt-4 w-full max-w-6xl px-3 sm:px-6">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="order-2 lg:order-1">
+        <div className="grid h-[calc(100vh-124px)] grid-cols-1 gap-4 overflow-hidden lg:grid-cols-[360px_1fr_360px]">
+          <div className="order-2 flex min-h-0 flex-col gap-4 lg:order-1">
             <StakePreview />
-          </div>
-          <div className="order-1 lg:order-2">
-            <UpgradeWheel />
-          </div>
-          <div className="order-3">
-            <TargetPreview />
-          </div>
-
-          <div className="order-4">
             <InventoryPanel />
           </div>
-          <div className="order-5 lg:col-span-2">
+
+          <div className="order-1 min-h-0 lg:order-2">
+            <UpgradeWheel />
+          </div>
+
+          <div className="order-3 flex min-h-0 flex-col gap-4">
+            <TargetPreview />
             <UpgradeControls />
           </div>
         </div>
