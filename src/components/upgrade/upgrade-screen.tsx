@@ -1,13 +1,21 @@
 "use client";
 
+import { useEffect } from "react";
 import { Topbar } from "@/components/upgrade/topbar";
 import { InventoryPanel } from "@/components/upgrade/inventory-panel";
 import { UpgradeWheel } from "@/components/upgrade/upgrade-wheel";
 import { UpgradeControls } from "@/components/upgrade/upgrade-controls";
 import { StakePreview } from "@/components/upgrade/stake-preview";
 import { TargetPreview } from "@/components/upgrade/target-preview";
+import { useUpgradeStore } from "@/store/use-upgrade-store";
 
 export function UpgradeScreen() {
+  const loadCatalog = useUpgradeStore((s) => s.loadCatalog);
+
+  useEffect(() => {
+    loadCatalog();
+  }, [loadCatalog]);
+
   return (
     <div className="min-h-screen overflow-hidden pb-6">
       <Topbar />
@@ -32,4 +40,3 @@ export function UpgradeScreen() {
     </div>
   );
 }
-

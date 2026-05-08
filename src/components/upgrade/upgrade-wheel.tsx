@@ -14,20 +14,6 @@ function clamp(n: number, a: number, b: number) {
   return Math.min(b, Math.max(a, n));
 }
 
-function normDeg(d: number) {
-  const x = d % 360;
-  return x < 0 ? x + 360 : x;
-}
-
-function inSector(angleDeg: number, startDeg: number, spanDeg: number) {
-  const a = normDeg(angleDeg);
-  const s = normDeg(startDeg);
-  const e = normDeg(startDeg + spanDeg);
-  if (spanDeg >= 360) return true;
-  if (s <= e) return a >= s && a <= e;
-  return a >= s || a <= e;
-}
-
 export function UpgradeWheel() {
   const bet = useUpgradeStore((s) => s.bet);
   const targetSkinId = useUpgradeStore((s) => s.targetSkinId);
@@ -91,25 +77,11 @@ export function UpgradeWheel() {
     const loseSpan = 360 - winSpan;
     const winStart = 180 - winSpan / 2; // win sector centered at bottom
 
-    const localT = res.win
-      ? res.chancePct > 0
-        ? res.roll / res.chancePct
-        : 0
-      : 100 - res.chancePct > 0
-        ? (res.roll - res.chancePct) / (100 - res.chancePct)
-        : 0;
-
-    const safePadDeg = 4; // keep pointer away from boundary so it never "looks like" the other outcome
-    const span = res.win ? winSpan : loseSpan;
-    const usableSpan = Math.max(0, span - safePadDeg * 2);
-    const offsetWithin = safePadDeg + usableSpan * clamp(localT, 0, 1);
-    let finalAngle = res.win
-      ? winStart + offsetWithin
-      : winStart + winSpan + (loseSpan > 0 ? offsetWithin : safePadDeg);
-
-    const landsInWin = inSector(finalAngle, winStart, winSpan);
-    if (res.win && !landsInWin) finalAngle = winStart + winSpan * 0.5;
-    if (!res.win && landsInWin) finalAngle = winStart + winSpan + loseSpan * 0.5;
+    // Keep it simple & unambiguous:
+    // pointer always lands clearly inside the filled (win) or empty (lose) sector.
+    const finalAngle = res.win
+      ? winStart + winSpan * 0.5
+      : winStart + winSpan + loseSpan * 0.5;
 
     const target = rotation.get() + baseTurns * 360 + finalAngle;
 

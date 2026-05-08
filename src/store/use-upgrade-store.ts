@@ -37,6 +37,7 @@ type UpgradeState = {
   fakeJackpot: number;
 
   catalog: Skin[];
+  loadCatalog: () => Promise<void>;
   addTestSkins: (count?: number) => void;
   selectBetSkin: (instanceId: string) => void;
   setBetBalance: (amount: number) => void;
@@ -80,6 +81,18 @@ export const useUpgradeStore = create<UpgradeState>()(
       fakeJackpot: 182_340,
 
       catalog: SKINS,
+
+      loadCatalog: async () => {
+        try {
+          const res = await fetch("/api/skins");
+          if (!res.ok) return;
+          const data = (await res.json()) as { skins?: Skin[] };
+          if (!data.skins || !Array.isArray(data.skins) || data.skins.length === 0) return;
+          set(() => ({ catalog: data.skins! }));
+        } catch {
+          // ignore, keep fallback
+        }
+      },
 
       addTestSkins: (count = 6) => {
         const pool = get().catalog;
